@@ -1,9 +1,16 @@
-// Just a simple calculation:
-x=3;
-b=2;
-r=1;
+.hardware helloworld
 
-while (x>0) {
-	r=r*b;
-	x=x-1;
-}
+// Minimal eksempel.
+
+.inputs Reset
+.outputs Oscillator
+
+.latch Oscillator -> OscillatorM
+
+.update
+
+Oscillator = !OscillatorM && !Reset
+
+.simulate
+Reset=0000100
+
