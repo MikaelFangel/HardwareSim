@@ -1,4 +1,4 @@
-grammar impl;
+grammar hwsim;
 
 start   : command* EOF;
 
