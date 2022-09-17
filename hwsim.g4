@@ -3,16 +3,20 @@ grammar hwsim;
 start   : commands* EOF;
 
 commands            : COMMAND IDENTIFIER* 
-                    | '.latch' IDENTIFIER '->' IDENTIFIER
+                    | '.latch' expr
                     | '.simulate' expr
+                    | '.update' expr
                     | COMMAND
                     ;
 
 expr                : IDENTIFIER '=' CONSTANT
                     | IDENTIFIER '=' condition
+                    | IDENTIFIER '->' IDENTIFIER
                     ;
 
-condition           : '!'? IDENTIFIER ('&&' | '||') condition ;
+condition           : condition ('&&'||'!') condition
+                    | IDENTIFIER
+                    ;
 
 IDENTIFIER          : [a-zA-Z_][a-zA-Z0-9_]* ;
 CONSTANT            : [01]+ ;
