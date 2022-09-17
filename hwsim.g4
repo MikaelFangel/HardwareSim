@@ -14,7 +14,8 @@ expr                : IDENTIFIER '=' CONSTANT
                     | IDENTIFIER '->' IDENTIFIER
                     ;
 
-condition           : condition ('&&'||'!') condition
+condition           : '!' condition
+                    | condition '&&' condition
                     | IDENTIFIER
                     ;
 
