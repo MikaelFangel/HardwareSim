@@ -15,7 +15,9 @@ expr                : IDENTIFIER '=' CONSTANT
                     ;
 
 condition           : '!' condition
-                    | condition '&&' condition
+                    | condition ('&&') condition
+                    | condition ('||') condition
+                    | '(' condition ')'
                     | IDENTIFIER
                     ;
 
