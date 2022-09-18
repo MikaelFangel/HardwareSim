@@ -5,7 +5,7 @@ start   : commands* EOF;
 commands            : COMMAND IDENTIFIER* 
                     | '.latch' expr
                     | '.simulate' expr
-                    | '.update' expr
+                    | '.update' expr+
                     | COMMAND
                     ;
 
