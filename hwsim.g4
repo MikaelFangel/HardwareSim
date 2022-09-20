@@ -1,19 +1,17 @@
 grammar hwsim;
 
-start   : commands* EOF;
+start   : hardware input output latch update simulate EOF;
 
-commands            : '.hardware' IDENTIFIER
-                    | '.inputs' IDENTIFIER+
-                    | '.outputs' IDENTIFIER+
-                    | '.latch' latchDec+ 
-                    | '.update' updateDec+
-                    | '.simulate' simIn
-                    | COMMAND
-                    ;
+hardware            : '.hardware' IDENTIFIER ;
+input               : '.inputs' IDENTIFIER+ ;
+output              : '.outputs' IDENTIFIER+ ;
+latch               : '.latch' latchDec+  ;
+update              : '.update' updateDec+ ;
+simulate            : '.simulate' simIn ;
 
-simIn               : IDENTIFIER '=' CONSTANT;
-updateDec           : IDENTIFIER '=' condition;
-latchDec            : IDENTIFIER '->' IDENTIFIER;
+simIn               : IDENTIFIER '=' BINARY ;
+updateDec           : IDENTIFIER '=' condition ;
+latchDec            : IDENTIFIER '->' IDENTIFIER ;
 
 condition           : '!' condition
                     | condition ('&&') condition
@@ -23,9 +21,8 @@ condition           : '!' condition
                     ;
 
 IDENTIFIER          : [a-zA-Z_][a-zA-Z0-9_]* ;
-CONSTANT            : [01]+ ;
-COMMAND             : '.'[a-zA-Z]+ ;
+BINARY: [01]+ ;
 
 WHITESPACE          : [ \t\n]+ -> skip ;
 COMMENT             : '//' ~[\n]* -> skip ;
-MULTILINECOMMENTS   :  '/*'  ( '*'~[/] | ~[*]  )* '*/' -> skip;
+MULTILINECOMMENTS   :  '/*'  ( '*'~[/] | ~[*]  )* '*/' -> skip ;
