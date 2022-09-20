@@ -1,6 +1,6 @@
 grammar hwsim;
 
-start   : hardware input output latch update simulate EOF;
+start   : hardware input output latch+ update simulate EOF;
 
 hardware            : '.hardware' IDENTIFIER ;
 input               : '.inputs' IDENTIFIER+ ;
