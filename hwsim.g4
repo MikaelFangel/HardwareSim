@@ -2,17 +2,18 @@ grammar hwsim;
 
 start   : commands* EOF;
 
-commands            : COMMAND IDENTIFIER* 
-                    | '.latch' expr
-                    | '.simulate' expr
-                    | '.update' expr+
+commands            : '.hardware' IDENTIFIER
+                    | '.inputs' IDENTIFIER+
+                    | '.outputs' IDENTIFIER+
+                    | '.latch' latchDec+ 
+                    | '.update' updateDec+
+                    | '.simulate' simIn
                     | COMMAND
                     ;
 
-expr                : IDENTIFIER '=' CONSTANT
-                    | IDENTIFIER '=' condition
-                    | IDENTIFIER '->' IDENTIFIER
-                    ;
+simIn               : IDENTIFIER '=' CONSTANT;
+updateDec           : IDENTIFIER '=' condition;
+latchDec            : IDENTIFIER '->' IDENTIFIER;
 
 condition           : '!' condition
                     | condition ('&&') condition
