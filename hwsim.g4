@@ -13,11 +13,11 @@ simIn               : IDENTIFIER '=' BINARY ;
 updateDec           : IDENTIFIER '=' condition ;
 latchDec            : IDENTIFIER '->' IDENTIFIER ;
 
-condition           : '!' condition
-                    | condition ('&&') condition
-                    | condition ('||') condition
-                    | '(' condition ')'
-                    | IDENTIFIER
+condition           : '!' condition                     # Negation
+                    | c1=condition ('&&') c2=condition  # Conjunction
+                    | c1=condition ('||') c2=condition  # Dijunction
+                    | '('c1=condition ')'               # Parenteses
+                    | x=IDENTIFIER                      # Variable
                     ;
 
 IDENTIFIER          : [a-zA-Z_][a-zA-Z0-9_]* ;
