@@ -23,7 +23,6 @@
 hs_err_pid*
 
 # Antlr
-*.java
 *.interp
 *.tokens
 .DS_Store
