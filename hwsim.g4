@@ -15,8 +15,8 @@ latchDec            : IDENTIFIER '->' IDENTIFIER ;
 
 condition           : '!' condition                     # Negation
                     | c1=condition ('&&') c2=condition  # Conjunction
-                    | c1=condition ('||') c2=condition  # Dijunction
-                    | '('c1=condition ')'               # Parenteses
+                    | c1=condition ('||') c2=condition  # Disjunction
+                    | '('c1=condition ')'               # Parentheses
                     | x=IDENTIFIER                      # Variable
                     ;
 
