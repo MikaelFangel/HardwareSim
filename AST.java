@@ -8,36 +8,56 @@ import java.util.List;
 
 public abstract class AST{};
 
-abstract class Update extends AST {
-    abstract public void eval();
+abstract class Expr extends AST {
+    abstract public boolean eval();
+}
+
+class Negation extends Expr {
+    boolean c1;
+    Negation(boolean c1) {
+        this.c1 = c1;
+    }
+
+    public boolean eval() {
+        return !c1;
+    }
+}
+
+class Conjunction extends Expr {
+    boolean c1, c2;
+    Conjunction(boolean c1, boolean c2) {
+        this.c1 = c1;
+        this.c2 = c2;
+    }
+
+    public boolean eval() {
+        return c1 && c2;
+    }
+}
+
+class Disjunction extends Expr {
+    boolean c1, c2;
+    Disjunction(boolean c1, boolean c2) {
+        this.c1 = c1;
+        this.c2 = c2;
+    }
+
+    public boolean eval() {
+        return c1 || c2;
+    }
+
 }
 
 
-abstract class Condition {
-
-}
-
-class Negation extends Condition {
-
-}
-
-class Conjunction extends Condition {
-
-}
-
-class Disjunction extends Condition {
-
-}
-
-class Parentheses extends Condition {
-
-}
-
-class Variable extends Condition {
+// Leaf of a tree
+class Variable extends Expr {
     public String varName;
-    
     Variable(String varName) {
         this.varName = varName;
     }
 
+    public boolean eval() {
+        System.out.println("Variable not implemented, assyming " + varName + " = 0");
+        return false;
+    }
 }
