@@ -8,26 +8,36 @@ import java.util.List;
 
 public abstract class AST{};
 
-abstract class Condition extends AST {
+abstract class Update extends AST {
+    abstract public void eval();
+}
+
+
+abstract class Condition {
 
 }
 
-class And extends Condition {
+class Negation extends Condition {
 
 }
 
-class Or extends Condition {
+class Conjunction extends Condition {
 
 }
 
-class Not extends Condition {
+class Disjunction extends Condition {
 
 }
 
-class Constant extends Condition {
+class Parentheses extends Condition {
 
 }
 
-class Identifier extends Condition {
+class Variable extends Condition {
+    public String varName;
+    
+    Variable(String varName) {
+        this.varName = varName;
+    }
 
 }
