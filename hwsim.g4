@@ -1,6 +1,8 @@
 grammar hwsim;
 
-start   : hardware input output latch+ update simulate EOF;
+start   : e=expr EOF;
+
+expr                : hardware input output latch+ up=update simulate ;
 
 hardware            : '.hardware' IDENTIFIER ;
 input               : '.inputs' IDENTIFIER+ ;
@@ -13,7 +15,7 @@ simIn               : IDENTIFIER '=' BINARY ;
 updateDec           : IDENTIFIER '=' condition ;
 latchDec            : IDENTIFIER '->' IDENTIFIER ;
 
-condition           : '!' condition                     # Negation
+condition           : '!' c1=condition                  # Negation
                     | c1=condition ('&&') c2=condition  # Conjunction
                     | c1=condition ('||') c2=condition  # Disjunction
                     | '('c1=condition ')'               # Parentheses
@@ -21,7 +23,7 @@ condition           : '!' condition                     # Negation
                     ;
 
 IDENTIFIER          : [a-zA-Z_][a-zA-Z0-9_]* ;
-BINARY: [01]+ ;
+BINARY              : [01]+ ;
 
 WHITESPACE          : [ \t\n]+ -> skip ;
 COMMENT             : '//' ~[\n]* -> skip ;
