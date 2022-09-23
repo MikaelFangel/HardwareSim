@@ -1,16 +1,35 @@
-.hardware helloworld
+.hardware trafiklys
 
-// Minimal eksempel.
+// Trafiklys eksempel.
 
-.inputs Reset
-.outputs Oscillator
+.inputs Button
+.outputs Red Yel Green PRed PGreen
 
-.latch Oscillator -> OscillatorM
+.latch Red -> RedM
+.latch Yel -> YelM
+.latch Req -> ReqM
 
 .update
 
-Oscillator = !OscillatorM && !Reset
+Clr = RedM && !YelM
+Req = (ReqM || Button) && !Clr
+Red = !RedM && YelM || RedM && !YelM
+Yel = !RedM && !YelM && Req || RedM && !YelM
+Green  = !Red && !Yel
+PGreen = Red && !Yel
+PRed   = !PGreen
 
-.simulate
-Reset=0000100
+.simulate Button=001001111001
 
+/*
+
+Expected output of the simulator:
+
+001001111001 Button
+000110011000 Red
+001010101001 Yel
+110001000110 Green
+111011101111 PRed
+000100010000 PGreen
+
+*/
