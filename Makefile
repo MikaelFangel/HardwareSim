@@ -1,6 +1,6 @@
 antlr4 = java org.antlr.v4.Tool
 grun = java org.antlr.v4.gui.TestRig
-SRCFILES = main.java
+SRCFILES = main.java AST.java
 GENERATED = hwsimParser.java hwsimBaseVisitor.java hwsimVisitor.java hwsimLexer.java
 
 all:
