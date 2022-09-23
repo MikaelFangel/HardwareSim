@@ -59,23 +59,23 @@ class Interpreter extends AbstractParseTreeVisitor<Expr> implements hwsimVisitor
     
     public Expr visitNegation(hwsimParser.NegationContext ctx) {
     	return new Negation(visit(ctx.c1));
-    };
+    }
 
     public Expr visitConjunction(hwsimParser.ConjunctionContext ctx) {
     	return new Conjunction(visit(ctx.c1), visit(ctx.c2));
-    };
+    }
 
     public Expr visitDisjunction(hwsimParser.DisjunctionContext ctx) {
     	return new Disjunction(visit(ctx.c1), visit(ctx.c2));
-    };
+    }
 
     public Expr visitVariable(hwsimParser.VariableContext ctx) {
     	return new Variable(ctx.x.getText());
-    };
+    }
 
     public Expr visitParentheses(hwsimParser.ParenthesesContext ctx) {
     	return visit(ctx.c1);
-    };
+    }
 
 
 }
