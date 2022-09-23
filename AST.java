@@ -9,43 +9,42 @@ import java.util.List;
 public abstract class AST{};
 
 abstract class Expr extends AST {
-    abstract public boolean eval();
+    abstract public int eval();
 }
 
 class Negation extends Expr {
-    boolean c1;
-    Negation(boolean c1) {
+    Expr c1;
+    Negation(Expr c1) {
         this.c1 = c1;
     }
 
-    public boolean eval() {
-        return !c1;
+    public int eval() {
+        return ~c1.eval();
     }
 }
 
 class Conjunction extends Expr {
-    boolean c1, c2;
-    Conjunction(boolean c1, boolean c2) {
+    Expr c1, c2;
+    Conjunction(Expr c1, Expr c2) {
         this.c1 = c1;
         this.c2 = c2;
     }
 
-    public boolean eval() {
-        return c1 && c2;
+    public int eval() {
+        return c1.eval() & c2.eval();
     }
 }
 
 class Disjunction extends Expr {
-    boolean c1, c2;
-    Disjunction(boolean c1, boolean c2) {
+    Expr c1, c2;
+    Disjunction(Expr c1, Expr c2) {
         this.c1 = c1;
         this.c2 = c2;
     }
 
-    public boolean eval() {
-        return c1 || c2;
+    public int eval() {
+        return c1.eval() | c2.eval();
     }
-
 }
 
 
@@ -56,8 +55,20 @@ class Variable extends Expr {
         this.varName = varName;
     }
 
-    public boolean eval() {
+    public int eval() {
         System.out.println("Variable not implemented, assyming " + varName + " = 0");
-        return false;
+        return 0;
     }
 }
+
+class Binary extends Expr {
+    public int i;
+    Binary(int i) {
+        this.i = i;
+    }
+
+    public int eval() {
+        return i;
+    }
+}
+
