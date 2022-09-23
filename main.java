@@ -49,13 +49,9 @@ public class main {
 
 class Interpreter extends AbstractParseTreeVisitor<Expr> implements hwsimVisitor<Expr> {
 
-    	if (ctx.up.getText().equals("update")) {
-    		return visit(ctx.e.up);
-    	}
-    	return visit(ctx.e);
-    	
-    };
     public Expr visitStart(hwsimParser.StartContext ctx){
+    	return visit(ctx.p);
+    }
     
     public Expr visitNegation(hwsimParser.NegationContext ctx) {
     	return new Negation(visit(ctx.c1));
@@ -77,6 +73,59 @@ class Interpreter extends AbstractParseTreeVisitor<Expr> implements hwsimVisitor
     	return visit(ctx.c1);
     }
 
+    public Expr visitLatchDec(hwsimParser.LatchDecContext ctx) {
+    	return new Variable("Hej");
+    }
 
+    public Expr visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
+    	return visit(ctx.e);
+    }
+
+    public Expr visitSimIn(hwsimParser.SimInContext ctx) {
+    	return new Binary(0);
+    }
+
+    public Expr visitSimulate(hwsimParser.SimulateContext ctx) {
+    	return visitSimIn(ctx.s);
+    }
+
+    public Expr visitUpdate(hwsimParser.UpdateContext ctx) {
+    	for (hwsimParser.UpdateDecContext c : ctx.u) {
+    		visitUpdateDec(c);
+    	}
+    	return new Variable("Hej");
+    }
+
+    public Expr visitLatch(hwsimParser.LatchContext ctx) {
+    	for (hwsimParser.LatchDecContext c : ctx.l) {
+    		visitLatchDec(c);
+    	}
+    	return new Variable("Hej");
+    }
+
+    public Expr visitOutput(hwsimParser.OutputContext ctx) {
+    	return new Variable("Hej");
+    }
+
+    public Expr visitInput(hwsimParser.InputContext ctx) {
+    	return new Variable("Hej");
+    }
+
+    public Expr visitHardware(hwsimParser.HardwareContext ctx) {
+    	return new Variable("Hej");
+    }
+
+    public Expr visitProg(hwsimParser.ProgContext ctx) {
+    	visit(ctx.h);
+    	visit(ctx.i);
+    	visit(ctx.o);
+
+    	for (hwsimParser.LatchContext c : ctx.l) {
+    		visit(c);
+    	}
+
+    	visit(ctx.u);
+    	return visit(ctx.s);
+    }
 }
 
