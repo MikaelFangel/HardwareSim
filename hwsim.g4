@@ -1,25 +1,25 @@
 grammar hwsim;
 
-start   : e=expr EOF;
+start   : p=prog EOF;
 
-expr                : hardware input output latch+ up=update simulate ;
+prog                : h=hardware i=input o=output l+=latch+ u=update s=simulate ;
 
 hardware            : '.hardware' IDENTIFIER ;
 input               : '.inputs' IDENTIFIER+ ;
 output              : '.outputs' IDENTIFIER+ ;
-latch               : '.latch' latchDec+  ;
-update              : '.update' updateDec+ ;
-simulate            : '.simulate' simIn ;
+latch               : '.latch' l+=latchDec+  ;
+update              : '.update' u+=updateDec+ ;
+simulate            : '.simulate' s=simIn ;
 
 simIn               : IDENTIFIER '=' BINARY ;
-updateDec           : IDENTIFIER '=' condition ;
+updateDec           : IDENTIFIER '=' e=expr ;
 latchDec            : IDENTIFIER '->' IDENTIFIER ;
 
-condition           : '!' c1=condition                  # Negation
-                    | c1=condition ('&&') c2=condition  # Conjunction
-                    | c1=condition ('||') c2=condition  # Disjunction
-                    | '('c1=condition ')'               # Parentheses
-                    | x=IDENTIFIER                      # Variable
+expr                : '!' c1=expr             # Negation
+                    | c1=expr ('&&') c2=expr  # Conjunction
+                    | c1=expr ('||') c2=expr  # Disjunction
+                    | '('c1=expr ')'          # Parentheses
+                    | x=IDENTIFIER            # Variable
                     ;
 
 IDENTIFIER          : [a-zA-Z_][a-zA-Z0-9_]* ;
