@@ -37,8 +37,9 @@ public class main {
 
 		// Construct an interpreter and run it on the parse tree
 		Interpreter interpreter = new Interpreter();
-		AST result = interpreter.visit(parseTree);
-		System.out.println("The result is: " + result);
+		//ExprList result=(ExprList)interpreter.visit(parseTree);
+        //result.eval();
+		//System.out.println("The result is: " + result);
     }
 }
 
@@ -47,75 +48,75 @@ public class main {
 // This is parameterized over a return type "<T>" which is in our case
 // simply a Integer.
 
-class Interpreter extends AbstractParseTreeVisitor<Expr> implements hwsimVisitor<Expr> {
+class Interpreter extends AbstractParseTreeVisitor<Prog> implements hwsimVisitor<Prog> {
 
-    public Expr visitStart(hwsimParser.StartContext ctx){
-    	return visit(ctx.p);
+    public Prog visitStart(hwsimParser.StartContext ctx){
+        return visit(ctx.p);
     }
     
-    public Expr visitNegation(hwsimParser.NegationContext ctx) {
+    public Prog visitNegation(hwsimParser.NegationContext ctx) {
     	return new Negation(visit(ctx.c1));
     }
 
-    public Expr visitConjunction(hwsimParser.ConjunctionContext ctx) {
+    public Prog visitConjunction(hwsimParser.ConjunctionContext ctx) {
     	return new Conjunction(visit(ctx.c1), visit(ctx.c2));
     }
 
-    public Expr visitDisjunction(hwsimParser.DisjunctionContext ctx) {
+    public Prog visitDisjunction(hwsimParser.DisjunctionContext ctx) {
     	return new Disjunction(visit(ctx.c1), visit(ctx.c2));
     }
 
-    public Expr visitVariable(hwsimParser.VariableContext ctx) {
+    public Prog visitVariable(hwsimParser.VariableContext ctx) {
     	return new Variable(ctx.x.getText());
     }
 
-    public Expr visitParentheses(hwsimParser.ParenthesesContext ctx) {
+    public Prog visitParentheses(hwsimParser.ParenthesesContext ctx) {
     	return visit(ctx.c1);
     }
 
-    public Expr visitLatchDec(hwsimParser.LatchDecContext ctx) {
+    public Prog visitLatchDec(hwsimParser.LatchDecContext ctx) {
     	return new Variable("Hej");
     }
 
-    public Expr visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
+    public Prog visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
     	return visit(ctx.e);
     }
 
-    public Expr visitSimIn(hwsimParser.SimInContext ctx) {
-    	return new Binary(0);
+    public Prog visitSimIn(hwsimParser.SimInContext ctx) {
+    	return new Binary(false);
     }
 
-    public Expr visitSimulate(hwsimParser.SimulateContext ctx) {
+    public Prog visitSimulate(hwsimParser.SimulateContext ctx) {
     	return visitSimIn(ctx.s);
     }
 
-    public Expr visitUpdate(hwsimParser.UpdateContext ctx) {
+    public Prog visitUpdate(hwsimParser.UpdateContext ctx) {
     	for (hwsimParser.UpdateDecContext c : ctx.u) {
     		visitUpdateDec(c);
     	}
     	return new Variable("Hej");
     }
 
-    public Expr visitLatch(hwsimParser.LatchContext ctx) {
+    public Prog visitLatch(hwsimParser.LatchContext ctx) {
     	for (hwsimParser.LatchDecContext c : ctx.l) {
     		visitLatchDec(c);
     	}
     	return new Variable("Hej");
     }
 
-    public Expr visitOutput(hwsimParser.OutputContext ctx) {
+    public Prog visitOutput(hwsimParser.OutputContext ctx) {
     	return new Variable("Hej");
     }
 
-    public Expr visitInput(hwsimParser.InputContext ctx) {
+    public Prog visitInput(hwsimParser.InputContext ctx) {
     	return new Variable("Hej");
     }
 
-    public Expr visitHardware(hwsimParser.HardwareContext ctx) {
+    public Prog visitHardware(hwsimParser.HardwareContext ctx) {
     	return new Variable("Hej");
     }
 
-    public Expr visitProg(hwsimParser.ProgContext ctx) {
+    public Prog visitProg(hwsimParser.ProgContext ctx) {
     	visit(ctx.h);
     	visit(ctx.i);
     	visit(ctx.o);
