@@ -1,12 +1,12 @@
 grammar hwsim;
 
-start   : p=prog EOF;
+start   : es+=prog EOF;
 
 prog                : h=hardware i=input o=output l+=latch+ u=update s=simulate ;
 
 hardware            : '.hardware' IDENTIFIER ;
-input               : '.inputs' IDENTIFIER+ ;
-output              : '.outputs' IDENTIFIER+ ;
+input               : '.inputs' id+=IDENTIFIER+  ;
+output              : '.outputs' id+=IDENTIFIER+ ;
 latch               : '.latch' l+=latchDec+  ;
 update              : '.update' u+=updateDec+ ;
 simulate            : '.simulate' s=simIn ;

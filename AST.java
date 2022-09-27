@@ -8,66 +8,66 @@ import java.util.List;
 
 public abstract class AST{};
 
-abstract class Expr extends AST {
-    abstract public int eval();
+abstract class Prog extends AST {
+    abstract public Boolean eval(Environment env);
 }
 
-class Negation extends Expr {
-    Expr c1;
-    Negation(Expr c1) {
+class Negation extends Prog {
+    Prog c1;
+    Negation(Prog c1) {
         this.c1 = c1;
     }
 
-    public int eval() {
-        return ~c1.eval();
+    public Boolean eval(Environment env) {
+        return ~c1.eval(env);
     }
 }
 
-class Conjunction extends Expr {
-    Expr c1, c2;
-    Conjunction(Expr c1, Expr c2) {
-        this.c1 = c1;
-        this.c2 = c2;
-    }
-
-    public int eval() {
-        return c1.eval() & c2.eval();
-    }
-}
-
-class Disjunction extends Expr {
-    Expr c1, c2;
-    Disjunction(Expr c1, Expr c2) {
+class Conjunction extends Prog {
+    Prog c1, c2;
+    Conjunction(Prog c1, Prog c2) {
         this.c1 = c1;
         this.c2 = c2;
     }
 
-    public int eval() {
-        return c1.eval() | c2.eval();
+    public Boolean eval(Environment env) {
+        return c1.eval(env) & c2.eval(env);
+    }
+}
+
+class Disjunction extends Prog {
+    Prog c1, c2;
+    Disjunction(Prog c1, Prog c2) {
+        this.c1 = c1;
+        this.c2 = c2;
+    }
+
+    public Boolean eval(Environment env) {
+        return c1.eval(env) | c2.eval(env);
     }
 }
 
 
 // Leaf of a tree
-class Variable extends Expr {
+class Variable extends Prog {
     public String varName;
     Variable(String varName) {
         this.varName = varName;
     }
 
-    public int eval() {
+    public Boolean eval(Environment env) {
         System.out.println("Variable not implemented, assyming " + varName + " = 0");
         return 0;
     }
 }
 
-class Binary extends Expr {
-    public int i;
-    Binary(int i) {
+class Binary extends Prog {
+    public Boolean i;
+    Binary(Boolean i) {
         this.i = i;
     }
 
-    public int eval() {
+    public Boolean eval(Environment env) {
         return i;
     }
 }
