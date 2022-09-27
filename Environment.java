@@ -2,21 +2,21 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 class Environment {
-    private HashMap<String,Integer> variableValues = new HashMap<String,Integer>();
+    private HashMap<String,Boolean> variableValues = new HashMap<String,Boolean>();
 
-    public void setVariable(String name, Integer value) {
+    public void setVariable(String name, Boolean value) {
         variableValues.put(name, value);
     }
 
-    public Integer getVariable(String name){
-        Integer value = variableValues.get(name); 
+    public Boolean getVariable(String name){
+        Boolean value = variableValues.get(name); 
         if (value == null) { System.err.println("Variable not defined: "+name); System.exit(1); }
         return value;
     }
 
     public String toString() {
         String table = "";
-        for (Entry<String,Integer> entry : variableValues.entrySet()) {
+        for (Entry<String,Boolean> entry : variableValues.entrySet()) {
             table += entry.getKey() + "\t-> " + entry.getValue() + "\n";
         }
         return table;

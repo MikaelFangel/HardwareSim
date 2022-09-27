@@ -19,7 +19,7 @@ class Negation extends Prog {
     }
 
     public Boolean eval(Environment env) {
-        return ~c1.eval(env);
+        return !c1.eval(env);
     }
 }
 
@@ -56,8 +56,8 @@ class Variable extends Prog {
     }
 
     public Boolean eval(Environment env) {
-        System.out.println("Variable not implemented, assyming " + varName + " = 0");
-        return 0;
+        //System.out.println("Variable not implemented, assyming " + varName + " = 0");
+        return env.getVariable(varName);
     }
 }
 

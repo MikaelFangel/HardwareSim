@@ -1,6 +1,6 @@
 grammar hwsim;
 
-start   : es+=prog EOF;
+start   : p=prog EOF;
 
 prog                : h=hardware i=input o=output l+=latch+ u=update s=simulate ;
 
