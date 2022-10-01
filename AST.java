@@ -12,9 +12,53 @@ abstract class Prog extends AST {
     abstract public Boolean eval(Environment env);
 }
 
-class Negation extends Prog {
-    Prog c1;
-    Negation(Prog c1) {
+/*class Output extends Prog {
+        
+}*/
+
+class Latch extends Prog {
+    Variable input;
+    Variable output;
+
+    public Latch(Variable input, Variable output) {
+        this.input = input;
+        this.output = output;
+    }
+    
+    public Boolean eval(Environment env) {
+        env.setVariable(input.varName, input.eval(env));
+        env.setVariable(output.varName, output.eval(env));
+    }
+    
+    public void initialize(Environment env) {
+        env.setVariable(output.varName, false);
+    }
+
+    public void nextCycle(Environment env) {
+        env.setVariable(input.varName, output.eval(env));
+    }
+}
+
+class Update extends Prog {
+   Variable v;
+   Expr e;
+
+   public Update(Variable v, Expr e) {
+       this.v = v;
+       this.e = e;
+    }
+   public Boolean eval(Environment env) {
+       env.setVariable(v.varName, e.eval(env));
+    }
+}
+
+abstract class Expr extends AST {
+    abstract public Boolean eval(Environment env);
+}
+
+class Negation extends Expr {
+    Expr c1;
+    Negation(Expr c1) {
         this.c1 = c1;
     }
 
@@ -23,9 +67,9 @@ class Negation extends Prog {
     }
 }
 
-class Conjunction extends Prog {
-    Prog c1, c2;
-    Conjunction(Prog c1, Prog c2) {
+class Conjunction extends Expr {
+    Expr c1, c2;
+    Conjunction(Expr c1, Expr c2) {
         this.c1 = c1;
         this.c2 = c2;
     }
@@ -35,9 +79,9 @@ class Conjunction extends Prog {
     }
 }
 
-class Disjunction extends Prog {
-    Prog c1, c2;
-    Disjunction(Prog c1, Prog c2) {
+class Disjunction extends Expr {
+    Expr c1, c2;
+    Disjunction(Expr c1, Expr c2) {
         this.c1 = c1;
         this.c2 = c2;
     }
@@ -49,7 +93,7 @@ class Disjunction extends Prog {
 
 
 // Leaf of a tree
-class Variable extends Prog {
+class Variable extends Expr {
     public String varName;
     Variable(String varName) {
         this.varName = varName;
@@ -61,7 +105,7 @@ class Variable extends Prog {
     }
 }
 
-class Binary extends Prog {
+class Binary extends Expr {
     public Boolean i;
     Binary(Boolean i) {
         this.i = i;
