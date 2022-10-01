@@ -2,14 +2,30 @@ grammar hwsim;
 
 start   : p=prog EOF;
 
-prog                : h=hardware i=input o=output l+=latch+ u=update s=simulate ;
+prog                : h=hardware i=input o=output l=latches u=update s=simulate ;
+
+latches             : latch latches             # MultiLatch
+                    | latch                     # SingleLatch
+                    ;
 
 hardware            : '.hardware' IDENTIFIER ;
-input               : '.inputs' id+=IDENTIFIER+  ;
-output              : '.outputs' id+=IDENTIFIER+ ;
-latch               : '.latch' l+=latchDec+  ;
-update              : '.update' u+=updateDec+ ;
+input               : '.inputs' id=identifiers ;
+output              : '.outputs' id=identifiers ;
+latch               : '.latch' l=latchDecs ;
+update              : '.update' u=updateDecs ;
 simulate            : '.simulate' s=simIn ;
+
+identifiers         : IDENTIFIER identifiers    # MultiId
+                    | IDENTIFIER                # SingleId
+                    ;
+
+latchDecs           : latchDec latchDecs        # MultiLatchDec
+                    | latchDec                  # SingleLatchDec
+                    ;
+
+updateDecs          : updateDec updateDecs      # MultiUpdate
+                    | updateDec                 # SingleUpdate
+                    ;
 
 simIn               : IDENTIFIER '=' BINARY ;
 updateDec           : IDENTIFIER '=' e=expr ;
