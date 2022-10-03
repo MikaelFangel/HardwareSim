@@ -8,23 +8,23 @@ latches             : l=latch ls=latches            # MultiLatch
                     | l=latch                       # SingleLatch
                     ;
 
-hardware            : '.hardware' IDENTIFIER ;
-input               : '.inputs' id=identifiers ;
-output              : '.outputs' id=identifiers ;
+hardware            : '.hardware' id=IDENTIFIER ;
+input               : '.inputs' id+=IDENTIFIER+ ;
+output              : '.outputs' id+=IDENTIFIER+ ;
 latch               : '.latch' l=latchDec ;
 update              : '.update' u=updateDecs ;
-simulate            : '.simulate' s=simIn ;
-
-identifiers         : id=IDENTIFIER ids=identifiers # MultiId
-                    | id=IDENTIFIER                 # SingleId
-                    ;
+simulate            : '.simulate' s=simIns ;
 
 updateDecs          : u=updateDec us=updateDecs     # MultiUpdate
                     | u=updateDec                   # SingleUpdate
                     ;
 
-simIn               : IDENTIFIER '=' BINARY+ ;
-updateDec           : IDENTIFIER '=' e=expr ;
+simIns              : s=simIn ss=simIns             # MultiSim
+                    | s=simIns                      # SingleSim
+                    ;
+
+simIn               : id=IDENTIFIER '=' b+=BINARY+ ;
+updateDec           : id=IDENTIFIER '=' e=expr ;
 latchDec            : id1=IDENTIFIER '->' id2=IDENTIFIER ;
 
 expr                : '!' c1=expr                   # Negation

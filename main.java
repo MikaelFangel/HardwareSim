@@ -89,19 +89,19 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
         return null;
     }
 
-    public AST visitMultiId(hwsimParser.MultiIdContext ctx) {
-        return null;
-    }
-
-    public AST visitSingleId(hwsimParser.SingleIdContext ctx) {
-        return null;
-    }
-
     public AST visitMultiUpdate(hwsimParser.MultiUpdateContext ctx) {
         return null;
     }
 
     public AST visitSingleUpdate(hwsimParser.SingleUpdateContext ctx) {
+        return null;
+    }
+
+    public AST visitMultiSim(hwsimParser.MultiSimContext ctx) {
+        return null;
+    }
+
+    public AST visitSingleSim(hwsimParser.SingleSimContext ctx) {
         return null;
     }
 
