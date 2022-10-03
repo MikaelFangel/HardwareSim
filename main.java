@@ -58,11 +58,11 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitMultiLatch(hwsimParser.MultiLatchContext ctx) {
-        return null;
+        return new MultiLatch((Latch) visit(ctx.l), (Latch) visit(ctx.ls));
     }
 
     public AST visitSingleLatch(hwsimParser.SingleLatchContext ctx) {
-        return visitLatch(ctx.l);
+        return new SingleLatch((Latch) visit(ctx.l));
     }
 
    public AST visitHardware(hwsimParser.HardwareContext ctx) {
@@ -78,7 +78,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitLatch(hwsimParser.LatchContext ctx) {
-        return null;
+        return new Latch((LatchDec) visit(ctx.l));
     }
 
     public AST visitUpdate(hwsimParser.UpdateContext ctx) {
@@ -94,14 +94,6 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitSingleId(hwsimParser.SingleIdContext ctx) {
-        return null;
-    }
-
-    public AST visitMultiLatchDec(hwsimParser.MultiLatchDecContext ctx) {
-        return null;
-    }
-
-    public AST visitSingleLatchDec(hwsimParser.SingleLatchDecContext ctx) {
         return null;
     }
 
