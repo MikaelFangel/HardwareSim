@@ -8,8 +8,10 @@ import java.util.List;
 
 public abstract class AST {};
 
-class NOP extends AST {
-}
+// class Prog extends AST {
+//     Hardware hardware;
+//     Input 
+// }
 
 class MultiLatch extends AST {
     Latch l1, l2;
@@ -25,20 +27,50 @@ class MultiLatch extends AST {
     }
 }
 
+class SingleLatch extends AST {
+    Latch l1;
+
+    SingleLatch(Latch l1) {
+        this.l1 = l1;
+    }
+
+    public void eval(Environment env) {
+        l1.eval(env);
+    }
+}
 
 class Latch extends AST {
+    LatchDec l;
+
+    Latch(LatchDec l) {
+        this.l = l;
+    }
+
+    public void eval(Environment env) {
+        l.eval(env);
+    }
+}
+
+class LatchDec extends AST {
     Variable input;
     Variable output;
 
-    public Latch(Variable input, Variable output) {
+    public LatchDec(Variable input, Variable output) {
         this.input = input;
         this.output = output;
     }
     
-    public Boolean eval(Environment env) {
+    public void eval(Environment env) {
         env.setVariable(input.varName, input.eval(env));
         env.setVariable(output.varName, output.eval(env));
-        return false;
+    }
+
+    public void initialize(Environment env) {
+        env.setVariable(output.varName, false);
+    }
+
+    public void nextCycle(Environment env) {
+        env.setVariable(input.varName, output.eval(env));
     }
 }
 
@@ -85,6 +117,7 @@ class Conjunction extends Expr {
 
 class Disjunction extends Expr {
     Expr c1, c2;
+
     Disjunction(Expr c1, Expr c2) {
         this.c1 = c1;
         this.c2 = c2;
@@ -99,12 +132,12 @@ class Disjunction extends Expr {
 // Leaf of a tree
 class Variable extends Expr {
     public String varName;
+
     Variable(String varName) {
         this.varName = varName;
     }
 
     public Boolean eval(Environment env) {
-        //System.out.println("Variable not implemented, assyming " + varName + " = 0");
         return env.getVariable(varName);
     }
 }

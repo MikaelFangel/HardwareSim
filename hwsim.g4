@@ -11,16 +11,12 @@ latches             : l=latch ls=latches            # MultiLatch
 hardware            : '.hardware' IDENTIFIER ;
 input               : '.inputs' id=identifiers ;
 output              : '.outputs' id=identifiers ;
-latch               : '.latch' l=latchDecs ;
+latch               : '.latch' l=latchDec ;
 update              : '.update' u=updateDecs ;
 simulate            : '.simulate' s=simIn ;
 
 identifiers         : id=IDENTIFIER ids=identifiers # MultiId
                     | id=IDENTIFIER                 # SingleId
-                    ;
-
-latchDecs           : l=latchDec ls=latchDecs       # MultiLatchDec
-                    | l=latchDec                    # SingleLatchDec
                     ;
 
 updateDecs          : u=updateDec us=updateDecs     # MultiUpdate
@@ -29,7 +25,7 @@ updateDecs          : u=updateDec us=updateDecs     # MultiUpdate
 
 simIn               : IDENTIFIER '=' BINARY ;
 updateDec           : IDENTIFIER '=' e=expr ;
-latchDec            : IDENTIFIER '->' IDENTIFIER ;
+latchDec            : id1=IDENTIFIER '->' id2=IDENTIFIER ;
 
 expr                : '!' c1=expr                   # Negation
                     | c1=expr ('&&') c2=expr        # Conjunction
