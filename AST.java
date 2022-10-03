@@ -111,7 +111,7 @@ class Conjunction extends Expr {
     }
 
     public Boolean eval(Environment env) {
-        return c1.eval(env) & c2.eval(env);
+        return c1.eval(env) && c2.eval(env);
     }
 }
 
@@ -124,7 +124,7 @@ class Disjunction extends Expr {
     }
 
     public Boolean eval(Environment env) {
-        return c1.eval(env) | c2.eval(env);
+    return c1.eval(env) || c2.eval(env);
     }
 }
 
@@ -142,14 +142,15 @@ class Variable extends Expr {
     }
 }
 
-class Binary extends Expr {
-    public Boolean i;
-    Binary(Boolean i) {
-        this.i = i;
+class Binary extends AST {
+    public Boolean binary;
+
+    Binary(Boolean binary) {
+        this.binary = binary;
     }
 
     public Boolean eval(Environment env) {
-        return i;
+        return binary;
     }
 }
 
