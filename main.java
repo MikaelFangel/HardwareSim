@@ -7,39 +7,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class main {
-    public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException {
 
-		// we expect exactly one argument: the name of the input file
-		if (args.length != 1) {
-		    System.err.println("\n");
-		    System.err.println("hwsim Interpreter\n");
-		    System.err.println("=================\n\n");
-		    System.err.println("Please give as input argument a filename\n");
-		    System.exit(-1);
-		}
-		String filename = args[0];
+        // we expect exactly one argument: the name of the input file
+        if (args.length != 1) {
+            System.err.println("\n");
+            System.err.println("hwsim Interpreter\n");
+            System.err.println("=================\n\n");
+            System.err.println("Please give as input argument a filename\n");
+            System.exit(-1);
+        }
+        String filename = args[0];
 
-		// open the input file
-		CharStream input = CharStreams.fromFileName(filename);
-		    //new ANTLRFileStream (filename); // depricated
-		
-		// create a lexer/scanner
-		hwsimLexer lex = new hwsimLexer(input);
-		
-		// get the stream of tokens from the scanner
-		CommonTokenStream tokens = new CommonTokenStream(lex);
-		
-		// create a parser
-		hwsimParser parser = new hwsimParser(tokens);
-		
-		// and parse anything from the grammar for "start"
-		ParseTree parseTree = parser.start();
+        // open the input file
+        CharStream input = CharStreams.fromFileName(filename);
+        // new ANTLRFileStream (filename); // depricated
 
-		// Construct an interpreter and run it on the parse tree
-		Interpreter interpreter = new Interpreter();
-		Prog result=(Prog)interpreter.visit(parseTree); 
+        // create a lexer/scanner
+        hwsimLexer lex = new hwsimLexer(input);
+
+        // get the stream of tokens from the scanner
+        CommonTokenStream tokens = new CommonTokenStream(lex);
+
+        // create a parser
+        hwsimParser parser = new hwsimParser(tokens);
+
+        // and parse anything from the grammar for "start"
+        ParseTree parseTree = parser.start();
+
+        // Construct an interpreter and run it on the parse tree
+        Interpreter interpreter = new Interpreter();
+        Prog result = (Prog) interpreter.visit(parseTree);
         result.eval(new Environment());
-		//System.out.println("The result is: " + result);
+        // System.out.println("The result is: " + result);
     }
 }
 
@@ -50,83 +50,106 @@ public class main {
 
 class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<AST> {
 
-    public AST visitStart(hwsimParser.StartContext ctx){
+    public AST visitStart(hwsimParser.StartContext ctx) {
         return visit(ctx.p);
-    }
-    
-    public Expr visitNegation(hwsimParser.NegationContext ctx) {
-    	return new Negation(visit(ctx.c1));
-    }
-
-    public Expr visitConjunction(hwsimParser.ConjunctionContext ctx) {
-    	return new Conjunction(visit(ctx.c1), visit(ctx.c2));
-    }
-
-    public Expr visitDisjunction(hwsimParser.DisjunctionContext ctx) {
-    	return new Disjunction(visit(ctx.c1), visit(ctx.c2));
-    }
-
-    public AST visitVariable(hwsimParser.VariableContext ctx) {
-    	return new Variable(ctx.x.getText());
-    }
-
-    public AST visitParentheses(hwsimParser.ParenthesesContext ctx) {
-    	return visit(ctx.c1);
-    }
-
-    public AST visitLatchDec(hwsimParser.LatchDecContext ctx) {
-    	return new Variable("Hej");
-    }
-
-    public AST visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
-    	return visit(ctx.e);
-    }
-
-    public AST visitSimIn(hwsimParser.SimInContext ctx) {
-    	return new Binary(false);
-    }
-
-    public AST visitSimulate(hwsimParser.SimulateContext ctx) {
-    	return visitSimIn(ctx.s);
-    }
-
-    public AST visitUpdate(hwsimParser.UpdateContext ctx) {
-    	for (hwsimParser.UpdateDecContext c : ctx.u) {
-    		visitUpdateDec(c);
-    	}
-    	return new Variable("Hej");
-    }
-
-    public AST visitLatch(hwsimParser.LatchContext ctx) {
-    	for (hwsimParser.LatchDecContext c : ctx.l) {
-    		visitLatchDec(c);
-    	}
-    	return new Variable("Hej");
-    }
-
-    public AST visitOutput(hwsimParser.OutputContext ctx) {
-    	return new Variable("Hej");
-    }
-
-    public AST visitInput(hwsimParser.InputContext ctx) {
-    	return new Variable("Hej");
-    }
-
-    public AST visitHardware(hwsimParser.HardwareContext ctx) {
-    	return new Variable("Hej");
     }
 
     public AST visitProg(hwsimParser.ProgContext ctx) {
-    	visit(ctx.h);
-    	visit(ctx.i);
-    	visit(ctx.o);
-
-    	for (hwsimParser.LatchContext c : ctx.l) {
-    		visit(c);
-    	}
-
-    	visit(ctx.u);
-    	return visit(ctx.s);
+        visit(ctx.h);
+        visit(ctx.i);
+        visit(ctx.o);
+        visit(ctx.l);
+        visit(ctx.u);
+        return visit(ctx.s);
     }
-}
 
+    public AST visitMultiLatch(hwsimParser.MultiLatchContext ctx) {
+        visitLatch(ctx.l);
+        return visitM;
+    }
+
+    public AST visitSingleLatch(hwsimParser.SingleLatchContext ctx) {
+        return visitLatch(ctx.l);
+    }
+
+    public AST visitHardware(hwsimParser.HardwareContext ctx) {
+        return new Variable("Hej");
+    }
+
+    public AST visitInput(hwsimParser.InputContext ctx) {
+        return visit(ctx.id);
+    }
+
+    public AST visitOutput(hwsimParser.OutputContext ctx) {
+        return visit(ctx.id);
+    }
+
+    public AST visitLatch(hwsimParser.LatchContext ctx) {
+        return visit(ctx.l);
+    }
+
+    public AST visitUpdate(hwsimParser.UpdateContext ctx) {
+        return visit(ctx.u);
+    }
+
+    public AST visitSimulate(hwsimParser.SimulateContext ctx) {
+        return visitSimIn(ctx.s);
+    }
+
+    public AST visitMultiId(hwsimParser.MultiIdContext ctx) {
+        new Variable(ctx.id);
+        return visitM;
+    }
+
+    public AST visitSingleLatch(hwsimParser.SingleLatchContext ctx) {
+        return visitLatch(ctx.l);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public Expr visitNegation(hwsimParser.NegationContext ctx) {
+        return new Negation(visit(ctx.c1));
+    }
+
+    public Expr visitConjunction(hwsimParser.ConjunctionContext ctx) {
+        return new Conjunction(visit(ctx.c1), visit(ctx.c2));
+    }
+
+    public Expr visitDisjunction(hwsimParser.DisjunctionContext ctx) {
+        return new Disjunction(visit(ctx.c1), visit(ctx.c2));
+    }
+
+    public AST visitVariable(hwsimParser.VariableContext ctx) {
+        return new Variable(ctx.x.getText());
+    }
+
+    public AST visitParentheses(hwsimParser.ParenthesesContext ctx) {
+        return visit(ctx.c1);
+    }
+
+    public AST visitLatchDec(hwsimParser.LatchDecContext ctx) {
+        return new Variable("Hej");
+    }
+
+    public AST visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
+        return visit(ctx.e);
+    }
+
+    public AST visitSimIn(hwsimParser.SimInContext ctx) {
+        return new Binary(false);
+    }
+
+
+}
