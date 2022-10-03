@@ -6,17 +6,27 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AST{};
+public abstract class AST {};
 
-abstract class Prog extends AST {
-    abstract public Boolean eval(Environment env);
+class NOP extends AST {
 }
 
-/*class Output extends Prog {
-        
-}*/
+class MultiLatch extends AST {
+    Latch l1, l2;
 
-class Latch extends Prog {
+    MultiLatch(Latch l1, Latch l2) {
+        this.l1 = l1;
+        this.l2 = l2;
+    }
+
+    public void eval(Environment env) {
+        l1.eval(env);
+        l2.eval(env);
+    }
+}
+
+
+class Latch extends AST {
     Variable input;
     Variable output;
 
@@ -28,18 +38,11 @@ class Latch extends Prog {
     public Boolean eval(Environment env) {
         env.setVariable(input.varName, input.eval(env));
         env.setVariable(output.varName, output.eval(env));
-    }
-    
-    public void initialize(Environment env) {
-        env.setVariable(output.varName, false);
-    }
-
-    public void nextCycle(Environment env) {
-        env.setVariable(input.varName, output.eval(env));
+        return false;
     }
 }
 
-class Update extends Prog {
+class Update extends AST {
    Variable v;
    Expr e;
 
@@ -49,6 +52,7 @@ class Update extends Prog {
     }
    public Boolean eval(Environment env) {
        env.setVariable(v.varName, e.eval(env));
+       return false;
     }
 }
 

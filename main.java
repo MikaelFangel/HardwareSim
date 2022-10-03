@@ -37,9 +37,9 @@ public class main {
 
         // Construct an interpreter and run it on the parse tree
         Interpreter interpreter = new Interpreter();
-        Prog result = (Prog) interpreter.visit(parseTree);
-        result.eval(new Environment());
-        // System.out.println("The result is: " + result);
+        AST result = (AST) interpreter.visit(parseTree);
+        // result.eval(new Environment());
+        System.out.println("The result is: " + result);
     }
 }
 
@@ -49,107 +49,100 @@ public class main {
 // simply a Integer.
 
 class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<AST> {
-
     public AST visitStart(hwsimParser.StartContext ctx) {
         return visit(ctx.p);
     }
 
     public AST visitProg(hwsimParser.ProgContext ctx) {
-        visit(ctx.h);
-        visit(ctx.i);
-        visit(ctx.o);
-        visit(ctx.l);
-        visit(ctx.u);
-        return visit(ctx.s);
+        return null;
     }
 
     public AST visitMultiLatch(hwsimParser.MultiLatchContext ctx) {
-        visitLatch(ctx.l);
-        return visitM;
+        return null;
     }
 
     public AST visitSingleLatch(hwsimParser.SingleLatchContext ctx) {
         return visitLatch(ctx.l);
     }
 
-    public AST visitHardware(hwsimParser.HardwareContext ctx) {
-        return new Variable("Hej");
+   public AST visitHardware(hwsimParser.HardwareContext ctx) {
+        return null;
     }
 
     public AST visitInput(hwsimParser.InputContext ctx) {
-        return visit(ctx.id);
+        return null;
     }
 
     public AST visitOutput(hwsimParser.OutputContext ctx) {
-        return visit(ctx.id);
+        return null;
     }
 
     public AST visitLatch(hwsimParser.LatchContext ctx) {
-        return visit(ctx.l);
+        return null;
     }
 
     public AST visitUpdate(hwsimParser.UpdateContext ctx) {
-        return visit(ctx.u);
+        return null;
     }
 
     public AST visitSimulate(hwsimParser.SimulateContext ctx) {
-        return visitSimIn(ctx.s);
+        return null;
     }
 
     public AST visitMultiId(hwsimParser.MultiIdContext ctx) {
-        new Variable(ctx.id);
-        return visitM;
+        return null;
     }
 
-    public AST visitSingleLatch(hwsimParser.SingleLatchContext ctx) {
-        return visitLatch(ctx.l);
+    public AST visitSingleId(hwsimParser.SingleIdContext ctx) {
+        return null;
+    }
+
+    public AST visitMultiLatchDec(hwsimParser.MultiLatchDecContext ctx) {
+        return null;
+    }
+
+    public AST visitSingleLatchDec(hwsimParser.SingleLatchDecContext ctx) {
+        return null;
+    }
+
+    public AST visitMultiUpdate(hwsimParser.MultiUpdateContext ctx) {
+        return null;
+    }
+
+    public AST visitSingleUpdate(hwsimParser.SingleUpdateContext ctx) {
+        return null;
+    }
+
+    public AST visitSimIn(hwsimParser.SimInContext ctx) {
+        return null;
+    }
+
+    public AST visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
+        return null;
+    }
+
+    public AST visitLatchDec(hwsimParser.LatchDecContext ctx) {
+        return null;
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public Expr visitNegation(hwsimParser.NegationContext ctx) {
-        return new Negation(visit(ctx.c1));
+    public AST visitNegation(hwsimParser.NegationContext ctx) {
+        return new Negation((Expr) visit(ctx.c1));
     }
 
-    public Expr visitConjunction(hwsimParser.ConjunctionContext ctx) {
-        return new Conjunction(visit(ctx.c1), visit(ctx.c2));
+    public AST visitConjunction(hwsimParser.ConjunctionContext ctx) {
+        return new Conjunction((Expr) visit(ctx.c1), (Expr) visit(ctx.c2));
     }
 
-    public Expr visitDisjunction(hwsimParser.DisjunctionContext ctx) {
-        return new Disjunction(visit(ctx.c1), visit(ctx.c2));
-    }
-
-    public AST visitVariable(hwsimParser.VariableContext ctx) {
-        return new Variable(ctx.x.getText());
+    public AST visitDisjunction(hwsimParser.DisjunctionContext ctx) {
+        return new Disjunction((Expr) visit(ctx.c1), (Expr) visit(ctx.c2));
     }
 
     public AST visitParentheses(hwsimParser.ParenthesesContext ctx) {
         return visit(ctx.c1);
     }
 
-    public AST visitLatchDec(hwsimParser.LatchDecContext ctx) {
-        return new Variable("Hej");
+    public AST visitVariable(hwsimParser.VariableContext ctx) {
+        return new Variable(ctx.x.getText());
     }
-
-    public AST visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
-        return visit(ctx.e);
-    }
-
-    public AST visitSimIn(hwsimParser.SimInContext ctx) {
-        return new Binary(false);
-    }
-
-
 }
