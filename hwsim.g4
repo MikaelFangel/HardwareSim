@@ -2,18 +2,22 @@ grammar hwsim;
 
 start   : p=prog EOF;
 
-prog                : h=hardware i=input o=output l=latches u=update s=simulate ;
+prog                : h=hardware i=input o=output l+=latch+ u=update s=simulate ;
 
-latches             : l=latch ls=latches            # MultiLatch
-                    | l=latch                       # SingleLatch
-                    ;
+//latches             :  ls+=latch+           //# MultiLatch
+                    //| l=latch                       # SingleLatch
+                    //;
 
 hardware            : '.hardware' id=IDENTIFIER ;
-input               : '.inputs' id+=IDENTIFIER+ ;
-output              : '.outputs' id+=IDENTIFIER+ ;
-latch               : '.latch' l=latchDec ;
+input               : '.inputs' id=identifiers ;
+output              : '.outputs' id=identifiers ;
+latch               : '.latch' id1=IDENTIFIER '->' id2=IDENTIFIER ;
 update              : '.update' u=updateDecs ;
 simulate            : '.simulate' s=simIns ;
+
+identifiers         : id1=IDENTIFIER id2=identifiers # MultiId
+                    | id=IDENTIFIER                  # SingleId
+                    ;
 
 updateDecs          : u=updateDec us=updateDecs     # MultiUpdate
                     | u=updateDec                   # SingleUpdate
@@ -23,9 +27,12 @@ simIns              : s=simIn ss=simIns             # MultiSim
                     | s=simIn                       # SingleSim
                     ;
 
-simIn               : id=IDENTIFIER '=' b+=BINARY+ ;
+simIn               : id=IDENTIFIER '=' b=binaries ;
 updateDec           : id=IDENTIFIER '=' e=expr ;
-latchDec            : id1=IDENTIFIER '->' id2=IDENTIFIER ;
+
+binaries            : b1=BINARY b2=binaries         # MultiBin
+                    | b=BINARY                      # SingleBin
+                    ;
 
 expr                : '!' c1=expr                   # Negation
                     | c1=expr ('&&') c2=expr        # Conjunction
