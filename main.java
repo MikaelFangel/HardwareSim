@@ -54,7 +54,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitProg(hwsimParser.ProgContext ctx) {
-        return null;
+        return new Prog((Hardware) visit(ctx.h), (Input) visit(ctx.i), (Output) visit(ctx.o), (Latches) visit(ctx.l), (Update) visit(ctx.u), (Simulate) visit(ctx.s));
     }
 
     public AST visitMultiLatch(hwsimParser.MultiLatchContext ctx) {
@@ -66,15 +66,15 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
    public AST visitHardware(hwsimParser.HardwareContext ctx) {
-        return null;
+        return new Hardware((Variable) visit(ctx.id));
     }
 
     public AST visitInput(hwsimParser.InputContext ctx) {
-        return null;
+        return new Input((VariableList) visit(ctx.id));
     }
 
     public AST visitOutput(hwsimParser.OutputContext ctx) {
-        return null;
+        return new Output((VariableList) visit(ctx.id));
     }
 
     public AST visitLatch(hwsimParser.LatchContext ctx) {
@@ -82,39 +82,39 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitUpdate(hwsimParser.UpdateContext ctx) {
-        return null;
+        return new Update((UpdateDecs) visit(ctx.u));
     }
 
     public AST visitSimulate(hwsimParser.SimulateContext ctx) {
-        return null;
+        return new Simulate((SimIns) visit(ctx.s));
     }
 
     public AST visitMultiUpdate(hwsimParser.MultiUpdateContext ctx) {
-        return null;
+        return new MultiUpdate((UpdateDec) visit(ctx.u), (UpdateDec) visit(ctx.us));
     }
 
     public AST visitSingleUpdate(hwsimParser.SingleUpdateContext ctx) {
-        return null;
+        return new SingleUpdate((UpdateDec) visit(ctx.u));
     }
 
     public AST visitMultiSim(hwsimParser.MultiSimContext ctx) {
-        return null;
+        return new MultiSim((SimIn) visit(ctx.s), (SimIn) visit(ctx.ss));
     }
 
     public AST visitSingleSim(hwsimParser.SingleSimContext ctx) {
-        return null;
+        return new SingleSim((SimIn) visit(ctx.s));
     }
 
     public AST visitSimIn(hwsimParser.SimInContext ctx) {
-        return null;
+        return new SimIn((Variable) visit(ctx.id), (BinaryList) visit(ctx.b));
     }
 
     public AST visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
-        return null;
+        return new UpdateDec((Variable) visit(ctx.id), (Expr) visit(ctx.e));
     }
 
     public AST visitLatchDec(hwsimParser.LatchDecContext ctx) {
-        return null;
+        return new LatchDec((Variable) visit(ctx.id1), (Variable) visit(ctx.id2));
     }
 
 
