@@ -54,31 +54,40 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitProg(hwsimParser.ProgContext ctx) {
-        return new Prog((Hardware) visit(ctx.h), (Input) visit(ctx.i), (Output) visit(ctx.o), (Latches) visit(ctx.l), (Update) visit(ctx.u), (Simulate) visit(ctx.s));
+    List<LatchDec> latches=new ArrayList<LatchDec>();
+        for (hwsimParser.LatchContext la : ctx.l) {
+            latches.add((LatchDec) visit(la));
+        }
+        return new Prog((Hardware) visit(ctx.h), (Input) visit(ctx.i), (Output) visit(ctx.o), latches, (Update) visit(ctx.u), (Simulate) visit(ctx.s));
     }
 
-    public AST visitMultiLatch(hwsimParser.MultiLatchContext ctx) {
-        return new MultiLatch((Latch) visit(ctx.l), (Latch) visit(ctx.ls));
-    }
+    // public AST visitLatches(hwsimParser.LatchesContext ctx) {
+    //     return new Latches((Latch) visit(ctx.l), (Latches) visit(ctx.ls));
+    // }
 
-    public AST visitSingleLatch(hwsimParser.SingleLatchContext ctx) {
-        return new SingleLatch((Latch) visit(ctx.l));
-    }
+    // public AST visitMultiLatch(hwsimParser.MultiLatchContext ctx) {
+    //     return new MultiLatch((Latch) visit(ctx.l), (Latches) visit(ctx.ls));
+    // }
+
+    // public AST visitSingleLatch(hwsimParser.SingleLatchContext ctx) {
+    //     return new SingleLatch((LatchDec) visit(ctx.l));
+    // }
 
    public AST visitHardware(hwsimParser.HardwareContext ctx) {
-        return new Hardware((Variable) visit(ctx.id));
+        return new Hardware(new Variable(ctx.id.getText()));
     }
 
     public AST visitInput(hwsimParser.InputContext ctx) {
-        return new Input((VariableList) visit(ctx.id));
+        return new Input((Identifiers) visit(ctx.id));
     }
 
     public AST visitOutput(hwsimParser.OutputContext ctx) {
-        return new Output((VariableList) visit(ctx.id));
+        return new Output((Identifiers) visit(ctx.id));
+        // return null;
     }
 
     public AST visitLatch(hwsimParser.LatchContext ctx) {
-        return new Latch((LatchDec) visit(ctx.l));
+        return new LatchDec(new Variable(ctx.id1.getText()), new Variable(ctx.id2.getText()));
     }
 
     public AST visitUpdate(hwsimParser.UpdateContext ctx) {
@@ -87,6 +96,14 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
 
     public AST visitSimulate(hwsimParser.SimulateContext ctx) {
         return new Simulate((SimIns) visit(ctx.s));
+    }
+
+    public AST visitMultiId(hwsimParser.MultiIdContext ctx) {
+        return new MultiId(new Variable(ctx.id1.getText()), new Variable(ctx.id2.getText()));
+    }
+
+    public AST visitSingleId(hwsimParser.SingleIdContext ctx) {
+        return new SingleId(new Variable(ctx.id.getText()));
     }
 
     public AST visitMultiUpdate(hwsimParser.MultiUpdateContext ctx) {
@@ -106,15 +123,26 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitSimIn(hwsimParser.SimInContext ctx) {
-        return new SimIn((Variable) visit(ctx.id), (BinaryList) visit(ctx.b));
+        return new SimIn(new Variable(ctx.id.getText()), (Binaries) visit(ctx.b));
+        // return null;
     }
 
     public AST visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
-        return new UpdateDec((Variable) visit(ctx.id), (Expr) visit(ctx.e));
+        return new UpdateDec(new Variable(ctx.id.getText()), (Expr) visit(ctx.e));
+        // return null;
     }
 
-    public AST visitLatchDec(hwsimParser.LatchDecContext ctx) {
-        return new LatchDec((Variable) visit(ctx.id1), (Variable) visit(ctx.id2));
+    // public AST visitLatchDec(hwsimParser.LatchDecContext ctx) {
+    //     return new LatchDec(new Variable(ctx.id1.getText()), new Variable(ctx.id2.getText()));
+    //     // return null;
+    // }
+
+    public AST visitMultiBin(hwsimParser.MultiBinContext ctx) {
+        return new MultiBin(new Binary(Boolean.parseBoolean(ctx.b1.getText())), new Binary(Boolean.parseBoolean(ctx.b2.getText())));
+    }
+
+    public AST visitSingleBin(hwsimParser.SingleBinContext ctx) {
+        return new SingleBin(new Binary(Boolean.parseBoolean(ctx.b.getText())));
     }
 
 

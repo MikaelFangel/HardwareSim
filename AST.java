@@ -12,11 +12,11 @@ class Prog extends AST {
     Hardware hardware;
     Input input;
     Output output;
-    Latches latches;
+    List<LatchDec> latches;
     Update update;
     Simulate simulate;
 
-    public Prog(Hardware hardware, Input input, Output output, Latches latches, Update update, Simulate simulate) {
+    public Prog(Hardware hardware, Input input, Output output, List<LatchDec> latches, Update update, Simulate simulate) {
         this.hardware = hardware;
         this.input = input;
         this.output = output;
@@ -26,12 +26,12 @@ class Prog extends AST {
     }
 
     public void eval(Environment env) {
-        hardware.eval(env);;
-        input.eval(env);;
-        output.eval(env);;
-        latches.eval(env);;
-        update.eval(env);;
-        simulate.eval(env);;
+        hardware.eval(env);
+        input.eval(env);
+        output.eval(env);
+        // latches.eval(env);
+        update.eval(env);
+        simulate.eval(env);
     }
 }
 
@@ -51,40 +51,56 @@ class Hardware extends AST {
 // Input and Output
 //-----------------------------------------------------------------------------------
 class Input extends AST {
-    VariableList varList;
+    Identifiers i;
 
-    Input(VariableList varList) {
-        this.varList = varList;
+    Input(Identifiers i) {
+        this.i = i;
     }
 
     public void eval(Environment env) {
-        varList.eval(env);
+        i.eval(env);
     }
 }
 
 class Output extends AST {
-    VariableList varList;
+    Identifiers i;
 
-    Output(VariableList varList) {
-        this.varList = varList;
+    Output(Identifiers i) {
+        this.i = i;
     }
 
     public void eval(Environment env) {
-        varList.eval(env);
+        i.eval(env);
     }
 }
 
-class VariableList extends AST {
-    List<Variable> varList;
+abstract class Identifiers extends AST {
+    abstract public void eval(Environment env);
+}
 
-    VariableList(List<Variable> varList) {
-        this.varList = varList;
+class MultiId extends Identifiers {
+    Variable id1, id2;
+
+    public MultiId(Variable id1, Variable id2) {
+        this.id1 = id1;
+        this.id2 = id2;
     }
 
     public void eval(Environment env) {
-        for (Variable var : varList) {
-            var.eval(env);
-        }
+        id1.eval(env);
+        id2.eval(env);
+    }
+}
+
+class SingleId extends Identifiers {
+    Variable id1;
+
+    public SingleId(Variable id1) {
+        this.id1 = id1;
+    }
+
+    public void eval(Environment env) {
+        id1.eval(env);
     }
 }
 
@@ -135,69 +151,98 @@ class SingleSim extends SimIns {
 
 class SimIn extends AST {
     Variable var;
-    BinaryList binaryList;
+    Binaries binaries;
 
-    public SimIn(Variable var, BinaryList binaryList) {
+    public SimIn(Variable var, Binaries binaries) {
         this.var = var;
-        this.binaryList = binaryList;
+        this.binaries = binaries;
     }
 
     public void eval(Environment env) {
         var.eval(env);
-        binaryList.eval(env);
+        binaries.eval(env);
     }
 }
 
-// ASK TA. Hashmap with list of binaries allowed? 
-// Assign in for each
-class BinaryList extends AST {
-    List<Binary> binaryList;
+abstract class Binaries extends AST {
+    abstract public void eval(Environment env);
+}
 
-    BinaryList(List<Binary> binaryList) {
-        this.binaryList = binaryList;
+class MultiBin extends Identifiers {
+    Binary b1, b2;
+
+    public MultiBin(Binary b1, Binary b2) {
+        this.b1 = b1;
+        this.b2 = b2;
     }
 
     public void eval(Environment env) {
-        for (Binary binary : binaryList) {
-            binary.eval(env);
-        }
+        b1.eval(env);
+        b2.eval(env);
+    }
+}
+
+class SingleBin extends Identifiers {
+    Binary b1;
+
+    public SingleBin(Binary b1) {
+        this.b1 = b1;
+    }
+
+    public void eval(Environment env) {
+        b1.eval(env);
     }
 }
 
 //-----------------------------------------------------------------------------------
 // Latches
 //-----------------------------------------------------------------------------------
-abstract class Latches extends AST {
-    abstract public void eval(Environment env);
-}
+// abstract class Latches extends AST {
+//     abstract public void eval(Environment env);
+// }
 
-class MultiLatch extends Latches {
-    Latch l1, l2;
+class Latches extends AST {
+    Latch l;
+    Latches ls;
 
-    MultiLatch(Latch l1, Latch l2) {
-        this.l1 = l1;
-        this.l2 = l2;
+    public Latches(Latch l, Latches ls) {
+        this.l = l;
+        this.ls = ls;
     }
 
     public void eval(Environment env) {
-        l1.eval(env);
-        l2.eval(env);
+        l.eval(env);
+        ls.eval(env);
     }
 }
 
-class SingleLatch extends Latches {
-    Latch l1;
+// class MultiLatch extends Latches {
+//     LatchDec l1, l2;
 
-    SingleLatch(Latch l1) {
-        this.l1 = l1;
-    }
+//     MultiLatch(LatchDec l1, LatchDec l2) {
+//         this.l1 = l1;
+//         this.l2 = l2;
+//     }
 
-    public void eval(Environment env) {
-        l1.eval(env);
-    }
-}
+//     public void eval(Environment env) {
+//         l1.eval(env);
+//         l2.eval(env);
+//     }
+// }
 
-class Latch extends Latches {
+// class SingleLatch extends Latches {
+//     LatchDec l1;
+
+//     SingleLatch(LatchDec l1) {
+//         this.l1 = l1;
+//     }
+
+//     public void eval(Environment env) {
+//         l1.eval(env);
+//     }
+// }
+
+class Latch extends AST {
     LatchDec l;
 
     Latch(LatchDec l) {
@@ -209,7 +254,7 @@ class Latch extends Latches {
     }
 }
 
-class LatchDec extends Latches {
+class LatchDec extends AST {
     Variable input;
     Variable output;
 
