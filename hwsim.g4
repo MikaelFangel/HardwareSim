@@ -20,7 +20,7 @@ updateDecs          : u=updateDec us=updateDecs     # MultiUpdate
                     ;
 
 simIns              : s=simIn ss=simIns             # MultiSim
-                    | s=simIn                      # SingleSim
+                    | s=simIn                       # SingleSim
                     ;
 
 simIn               : id=IDENTIFIER '=' b+=BINARY+ ;
