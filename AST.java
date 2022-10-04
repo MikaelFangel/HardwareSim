@@ -12,15 +12,15 @@ class Prog extends AST {
     Hardware hardware;
     Input input;
     Output output;
-    Latch latch;
+    Latches latches;
     Update update;
     Simulate simulate;
 
-    public Prog(Hardware hardware, Input input, Output output, Latch latch, Update update, Simulate simulate) {
+    public Prog(Hardware hardware, Input input, Output output, Latches latches, Update update, Simulate simulate) {
         this.hardware = hardware;
         this.input = input;
         this.output = output;
-        this.latch = latch;
+        this.latches = latches;
         this.update = update;
         this.simulate = simulate;
     }
@@ -29,7 +29,7 @@ class Prog extends AST {
         hardware.eval(env);;
         input.eval(env);;
         output.eval(env);;
-        latch.eval(env);;
+        latches.eval(env);;
         update.eval(env);;
         simulate.eval(env);;
     }
@@ -92,9 +92,9 @@ class VariableList extends AST {
 // Simulate
 //-----------------------------------------------------------------------------------
 class Simulate extends AST {
-    SimIn s;
+    SimIns s;
 
-    public Simulate(SimIn s) {
+    public Simulate(SimIns s) {
         this.s = s;
     }
 
@@ -107,7 +107,7 @@ abstract class SimIns extends AST {
     abstract public void eval(Environment env);
 }
 
-class MultiSim extends UpdateDecs {
+class MultiSim extends SimIns {
     SimIn s1, s2;
 
     public MultiSim(SimIn s1, SimIn s2) {
@@ -121,7 +121,7 @@ class MultiSim extends UpdateDecs {
     }
 }
 
-class SingleSim extends UpdateDecs {
+class SingleSim extends SimIns {
     SimIn s1;
 
     public SingleSim(SimIn s1) {
@@ -167,7 +167,11 @@ class BinaryList extends AST {
 //-----------------------------------------------------------------------------------
 // Latches
 //-----------------------------------------------------------------------------------
-class MultiLatch extends AST {
+abstract class Latches extends AST {
+    abstract public void eval(Environment env);
+}
+
+class MultiLatch extends Latches {
     Latch l1, l2;
 
     MultiLatch(Latch l1, Latch l2) {
@@ -181,7 +185,7 @@ class MultiLatch extends AST {
     }
 }
 
-class SingleLatch extends AST {
+class SingleLatch extends Latches {
     Latch l1;
 
     SingleLatch(Latch l1) {
@@ -193,7 +197,7 @@ class SingleLatch extends AST {
     }
 }
 
-class Latch extends AST {
+class Latch extends Latches {
     LatchDec l;
 
     Latch(LatchDec l) {
@@ -205,7 +209,7 @@ class Latch extends AST {
     }
 }
 
-class LatchDec extends AST {
+class LatchDec extends Latches {
     Variable input;
     Variable output;
 
