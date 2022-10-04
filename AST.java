@@ -159,7 +159,6 @@ class BinaryList extends AST {
 
     public void eval(Environment env) {
         for (Binary binary : binaryList) {
-            
             binary.eval(env);
         }
     }
