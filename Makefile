@@ -20,3 +20,6 @@ test:	main.class input.txt
 
 tree:	hwsimLexer.class hwsim.g4 input.txt
 	$(grun) hwsim start -gui -tokens input.txt
+	
+clean:
+	rm -rf *.class hwsim*.java hwsim*.interp hwsim*.tokens *.class
