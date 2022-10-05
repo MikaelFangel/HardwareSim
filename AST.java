@@ -35,7 +35,8 @@ class Prog extends AST {
         hardware.eval(env);
         input.eval(env);
         output.eval(env);
-        // latches.eval(env);
+        for(var v : latches)
+            v.eval(env);
         update.eval(env);
         simulate.eval(env);
     }
@@ -191,6 +192,7 @@ class Disjunction extends Expr {
 
 class Variable extends AST {
     public String varname;
+    public String string;
     public List<Boolean> binaries;
 
     Variable(String varname, List<Boolean> binaries) {
@@ -198,7 +200,11 @@ class Variable extends AST {
         this.binaries = binaries;
     }
 
-    public Boolean eval(Environemnt env) {
+    Variable(String varname, String string) {
+        this.string = string; 
+    }
+
+    public Boolean eval(Environment env) {
         return env.getVariable(varname);
     }
 }
