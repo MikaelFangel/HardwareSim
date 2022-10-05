@@ -148,6 +148,37 @@ class UpdateDec extends AST {
     }
 }
 
+class Simulate extends AST {
+    List<SimIn> simIn;
+
+    public Simulate(List<SimIn> simIn) {
+        this.simIn = simIn;
+    }
+
+    public void eval(Environment env) {
+        for(SimIn in : simIn) {
+            in.eval(env);
+        }
+    }
+}
+
+class SimIn extends AST {
+    Variable vari;
+    List<Variable> bList;
+
+    public SimIn(Variable vari, List<Variable> bList) {
+        this.vari = vari;
+        this.bList = bList;
+    }
+
+    public void eval(Environment env) {
+        vari.eval(env);
+        for(Variable b : bList) {
+            b.eval(env);
+        }
+    }
+}
+
 abstract class Expr extends AST {
     abstract public Boolean eval(Environment env);
 }

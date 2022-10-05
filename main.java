@@ -97,12 +97,17 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
         List<UpdateDec> us = new ArrayList<>();
         List<Expr> es = new ArrayList<>();
         for(var v : ctx.u)
-            us.add(new UpdateDec(new Variable(ctx.u.getText(), es)));
+            us.add(new UpdateDec(new Variable(v.getText(), ""), es));
         return new Update(us);
     }
 
     public AST visitSimulate(hwsimParser.SimulateContext ctx) {
-        return new Simulate(visit(ctx.s));
+        List<SimIn> simIn = new ArrayList<>();
+        List<Variable> bList = new ArrayList<>(); 
+        for (var s : ctx.s) {
+            simIn.add(new SimIn(new Variable(s.getText(), ""), bList));
+        }
+        return new Simulate(simIn);
     }
     
     public AST visitSimIn(hwsimParser.SimInContext ctx) {
