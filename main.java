@@ -58,93 +58,63 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
         for (hwsimParser.LatchContext la : ctx.l) {
             latches.add((LatchDec) visit(la));
         }
-        return new Prog((Hardware) visit(ctx.h), (Input) visit(ctx.i), (Output) visit(ctx.o), latches, (Update) visit(ctx.u), (Simulate) visit(ctx.s));
+
+        return new Prog((Hardware) visit(ctx.h), 
+        (Input) visit(ctx.i), 
+        (Output) visit(ctx.o), 
+        latches, 
+        (Update) visit(ctx.u), 
+        (Simulate) visit(ctx.s));
     }
 
-    // public AST visitLatches(hwsimParser.LatchesContext ctx) {
-    //     return new Latches((Latch) visit(ctx.l), (Latches) visit(ctx.ls));
-    // }
-
-    // public AST visitMultiLatch(hwsimParser.MultiLatchContext ctx) {
-    //     return new MultiLatch((Latch) visit(ctx.l), (Latches) visit(ctx.ls));
-    // }
-
-    // public AST visitSingleLatch(hwsimParser.SingleLatchContext ctx) {
-    //     return new SingleLatch((LatchDec) visit(ctx.l));
-    // }
-
    public AST visitHardware(hwsimParser.HardwareContext ctx) {
-        return new Hardware(new Variable(ctx.id.getText()));
+        return new Hardware(new Variable(".hardware", ctx.id.getText()));
     }
 
     public AST visitInput(hwsimParser.InputContext ctx) {
-        return new Input((Identifiers) visit(ctx.id));
+        List<Variable> ins = new ArrayList<>();
+        List<Boolean> b = new ArrayList<>();
+        for(var v : ctx.id)
+            ins.add(new Variable(v.getText(), b));
+
+        return new Input(ins);
     }
 
     public AST visitOutput(hwsimParser.OutputContext ctx) {
-        return new Output((Identifiers) visit(ctx.id));
-        // return null;
+        List<Variable> outs = new ArrayList<>();
+        List<Boolean> b = new ArrayList<>();
+        for(var v : ctx.id)
+            outs.add(new Variable(v.getText(), b));
+
+        return new Output(outs);
     }
 
     public AST visitLatch(hwsimParser.LatchContext ctx) {
-        return new LatchDec(new Variable(ctx.id1.getText()), new Variable(ctx.id2.getText()));
+        return new LatchDec(new Variable(ctx.id1.getText(), new ArrayList<Boolean>()), new Variable(ctx.id2.getText(), new ArrayList<Boolean>()));
     }
 
     public AST visitUpdate(hwsimParser.UpdateContext ctx) {
-        return new Update((UpdateDecs) visit(ctx.u));
+        List<UpdateDec> us = new ArrayList<>();
+        List<Expr> es = new ArrayList<>();
+        for(var v : ctx.u)
+            us.add(new UpdateDec(new Variable(ctx.u.getText(), es)));
+        return new Update(us);
     }
 
     public AST visitSimulate(hwsimParser.SimulateContext ctx) {
-        return new Simulate((SimIns) visit(ctx.s));
+        return new Simulate(visit(ctx.s));
     }
-
-    public AST visitMultiId(hwsimParser.MultiIdContext ctx) {
-        return new MultiId(new Variable(ctx.id1.getText()), new Variable(ctx.id2.getText()));
-    }
-
-    public AST visitSingleId(hwsimParser.SingleIdContext ctx) {
-        return new SingleId(new Variable(ctx.id.getText()));
-    }
-
-    public AST visitMultiUpdate(hwsimParser.MultiUpdateContext ctx) {
-        return new MultiUpdate((UpdateDec) visit(ctx.u), (UpdateDec) visit(ctx.us));
-    }
-
-    public AST visitSingleUpdate(hwsimParser.SingleUpdateContext ctx) {
-        return new SingleUpdate((UpdateDec) visit(ctx.u));
-    }
-
-    public AST visitMultiSim(hwsimParser.MultiSimContext ctx) {
-        return new MultiSim((SimIn) visit(ctx.s), (SimIn) visit(ctx.ss));
-    }
-
-    public AST visitSingleSim(hwsimParser.SingleSimContext ctx) {
-        return new SingleSim((SimIn) visit(ctx.s));
-    }
-
+    
     public AST visitSimIn(hwsimParser.SimInContext ctx) {
-        return new SimIn(new Variable(ctx.id.getText()), (Binaries) visit(ctx.b));
-        // return null;
+        return null;
     }
 
     public AST visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
-        return new UpdateDec(new Variable(ctx.id.getText()), (Expr) visit(ctx.e));
-        // return null;
+        List<Expr> es = new ArrayList<>();
+        for(var v : ctx.e)
+            es.add((Expr) v);
+        return new UpdateDec(new Variable(ctx.id.getText(), ""), es);
     }
-
-    // public AST visitLatchDec(hwsimParser.LatchDecContext ctx) {
-    //     return new LatchDec(new Variable(ctx.id1.getText()), new Variable(ctx.id2.getText()));
-    //     // return null;
-    // }
-
-    public AST visitMultiBin(hwsimParser.MultiBinContext ctx) {
-        return new MultiBin(new Binary(Boolean.parseBoolean(ctx.b1.getText())), new Binary(Boolean.parseBoolean(ctx.b2.getText())));
-    }
-
-    public AST visitSingleBin(hwsimParser.SingleBinContext ctx) {
-        return new SingleBin(new Binary(Boolean.parseBoolean(ctx.b.getText())));
-    }
-
 
     public AST visitNegation(hwsimParser.NegationContext ctx) {
         return new Negation((Expr) visit(ctx.c1));
@@ -163,6 +133,6 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitVariable(hwsimParser.VariableContext ctx) {
-        return new Variable(ctx.x.getText());
+        return new Variable(ctx.x.getText(), "");
     }
 }
