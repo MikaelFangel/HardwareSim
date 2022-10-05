@@ -4,35 +4,15 @@ start   : p=prog EOF;
 
 prog                : h=hardware i=input o=output l+=latch+ u=update s=simulate ;
 
-//latches             :  ls+=latch+           //# MultiLatch
-                    //| l=latch                       # SingleLatch
-                    //;
-
 hardware            : '.hardware' id=IDENTIFIER ;
-input               : '.inputs' id=identifiers ;
-output              : '.outputs' id=identifiers ;
+input               : '.inputs' id+=IDENTIFIER+ ;
+output              : '.outputs' id+=IDENTIFIER+ ;
 latch               : '.latch' id1=IDENTIFIER '->' id2=IDENTIFIER ;
-update              : '.update' u=updateDecs ;
-simulate            : '.simulate' s=simIns ;
+update              : '.update' u+=updateDec+ ;
+simulate            : '.simulate' s+=simIn+ ;
 
-identifiers         : id1=IDENTIFIER id2=identifiers # MultiId
-                    | id=IDENTIFIER                  # SingleId
-                    ;
-
-updateDecs          : u=updateDec us=updateDecs     # MultiUpdate
-                    | u=updateDec                   # SingleUpdate
-                    ;
-
-simIns              : s=simIn ss=simIns             # MultiSim
-                    | s=simIn                       # SingleSim
-                    ;
-
-simIn               : id=IDENTIFIER '=' b=binaries ;
-updateDec           : id=IDENTIFIER '=' e=expr ;
-
-binaries            : b1=BINARY b2=binaries         # MultiBin
-                    | b=BINARY                      # SingleBin
-                    ;
+simIn               : id=IDENTIFIER '=' b+=BINARY+ ;
+updateDec           : id=IDENTIFIER '=' e+=expr+ ;
 
 expr                : '!' c1=expr                   # Negation
                     | c1=expr ('&&') c2=expr        # Conjunction
