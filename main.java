@@ -117,7 +117,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     public AST visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
         List<Expr> es = new ArrayList<>();
         for(var v : ctx.e)
-            es.add((Expr) v);
+            es.add((Expr) visit(v));
         return new UpdateDec(new Variable(ctx.id.getText(), ""), es);
     }
 
