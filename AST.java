@@ -1,4 +1,3 @@
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.CharStreams;
@@ -16,7 +15,14 @@ class Prog extends AST {
     Update update;
     Simulate simulate;
 
-    public Prog(Hardware hardware, Input input, Output output, List<LatchDec> latches, Update update, Simulate simulate) {
+    public Prog(
+            Hardware hardware,
+            Input input,
+            Output output,
+            List<LatchDec> latches,
+            Update update,
+            Simulate simulate) {
+
         this.hardware = hardware;
         this.input = input;
         this.output = output;
@@ -47,212 +53,47 @@ class Hardware extends AST {
     }
 }
 
-//-----------------------------------------------------------------------------------
-// Input and Output
-//-----------------------------------------------------------------------------------
 class Input extends AST {
-    Identifiers i;
+    List<Variable> li;
 
-    Input(Identifiers i) {
-        this.i = i;
+    Input(List<Variable> li) {
+        this.li = li;
     }
 
     public void eval(Environment env) {
-        i.eval(env);
+        for(var v : li)
+            v.eval(env);
     }
 }
 
 class Output extends AST {
-    Identifiers i;
+    List<Variable> outputs;
 
-    Output(Identifiers i) {
-        this.i = i;
+    Output(List<Variable> outputs) {
+        this.outputs = outputs;
     }
 
     public void eval(Environment env) {
-        i.eval(env);
+        for(var v : outputs)
+            v.eval(env);
     }
 }
 
-abstract class Identifiers extends AST {
-    abstract public void eval(Environment env);
-}
-
-class MultiId extends Identifiers {
-    Variable id1, id2;
-
-    public MultiId(Variable id1, Variable id2) {
-        this.id1 = id1;
-        this.id2 = id2;
-    }
-
-    public void eval(Environment env) {
-        id1.eval(env);
-        id2.eval(env);
-    }
-}
-
-class SingleId extends Identifiers {
-    Variable id1;
-
-    public SingleId(Variable id1) {
-        this.id1 = id1;
-    }
-
-    public void eval(Environment env) {
-        id1.eval(env);
-    }
-}
-
-//-----------------------------------------------------------------------------------
-// Simulate
-//-----------------------------------------------------------------------------------
-class Simulate extends AST {
-    SimIns s;
-
-    public Simulate(SimIns s) {
-        this.s = s;
-    }
-
-    public void eval(Environment env) {
-        s.eval(env);
-    }
-}
-
-abstract class SimIns extends AST {
-    abstract public void eval(Environment env);
-}
-
-class MultiSim extends SimIns {
-    SimIn s1, s2;
-
-    public MultiSim(SimIn s1, SimIn s2) {
-        this.s1 = s1;
-        this.s2 = s2;
-    }
-
-    public void eval(Environment env) {
-        s1.eval(env);
-        s2.eval(env);
-    }
-}
-
-class SingleSim extends SimIns {
-    SimIn s1;
-
-    public SingleSim(SimIn s1) {
-        this.s1 = s1;
-    }
-
-    public void eval(Environment env) {
-        s1.eval(env);
-    }
-}
-
-class SimIn extends AST {
-    Variable var;
-    Binaries binaries;
-
-    public SimIn(Variable var, Binaries binaries) {
-        this.var = var;
-        this.binaries = binaries;
-    }
-
-    public void eval(Environment env) {
-        var.eval(env);
-        binaries.eval(env);
-    }
-}
-
-abstract class Binaries extends AST {
-    abstract public void eval(Environment env);
-}
-
-class MultiBin extends Identifiers {
-    Binary b1, b2;
-
-    public MultiBin(Binary b1, Binary b2) {
-        this.b1 = b1;
-        this.b2 = b2;
-    }
-
-    public void eval(Environment env) {
-        b1.eval(env);
-        b2.eval(env);
-    }
-}
-
-class SingleBin extends Identifiers {
-    Binary b1;
-
-    public SingleBin(Binary b1) {
-        this.b1 = b1;
-    }
-
-    public void eval(Environment env) {
-        b1.eval(env);
-    }
-}
-
-//-----------------------------------------------------------------------------------
-// Latches
-//-----------------------------------------------------------------------------------
-// abstract class Latches extends AST {
-//     abstract public void eval(Environment env);
-// }
-
-class Latches extends AST {
-    Latch l;
-    Latches ls;
-
-    public Latches(Latch l, Latches ls) {
-        this.l = l;
-        this.ls = ls;
-    }
-
-    public void eval(Environment env) {
-        l.eval(env);
-        ls.eval(env);
-    }
-}
-
-// class MultiLatch extends Latches {
-//     LatchDec l1, l2;
-
-//     MultiLatch(LatchDec l1, LatchDec l2) {
-//         this.l1 = l1;
-//         this.l2 = l2;
+// Maybe not needed
+// class Latches extends AST {
+//     Latch l;
+//     Latches ls;
+// 
+//     public Latches(Latch l, Latches ls) {
+//         this.l = l;
+//         this.ls = ls;
 //     }
-
+// 
 //     public void eval(Environment env) {
-//         l1.eval(env);
-//         l2.eval(env);
+//         l.eval(env);
+//         ls.eval(env);
 //     }
 // }
-
-// class SingleLatch extends Latches {
-//     LatchDec l1;
-
-//     SingleLatch(LatchDec l1) {
-//         this.l1 = l1;
-//     }
-
-//     public void eval(Environment env) {
-//         l1.eval(env);
-//     }
-// }
-
-class Latch extends AST {
-    LatchDec l;
-
-    Latch(LatchDec l) {
-        this.l = l;
-    }
-
-    public void eval(Environment env) {
-        l.eval(env);
-    }
-}
 
 class LatchDec extends AST {
     Variable input;
@@ -262,85 +103,50 @@ class LatchDec extends AST {
         this.input = input;
         this.output = output;
     }
-    
+
     public void eval(Environment env) {
-        env.setVariable(input.varName, input.eval(env));
-        env.setVariable(output.varName, output.eval(env));
+        env.setVariable(input.varname, input.eval(env));
+        env.setVariable(output.varname, output.eval(env));
     }
 
     public void initialize(Environment env) {
-        env.setVariable(output.varName, false);
+        env.setVariable(output.varname, false);
     }
 
     public void nextCycle(Environment env) {
-        env.setVariable(input.varName, output.eval(env));
+        env.setVariable(input.varname, output.eval(env));
     }
 }
 
-
-//-----------------------------------------------------------------------------------
-// Updates
-//-----------------------------------------------------------------------------------
 class Update extends AST {
-    UpdateDecs u;
+    List<UpdateDec> u;
 
-    public Update(UpdateDecs u) {
+    public Update(List<UpdateDec> u) {
         this.u = u;
     }
-
+    
     public void eval(Environment env) {
-        u.eval(env);
-    }
-}
-
-abstract class UpdateDecs extends AST {
-    abstract public void eval(Environment env);
-}
-
-class MultiUpdate extends UpdateDecs {
-    UpdateDec u1, u2;
-
-    public MultiUpdate(UpdateDec u1, UpdateDec u2) {
-        this.u1 = u1;
-        this.u2 = u2;
-    }
-
-    public void eval(Environment env) {
-        u1.eval(env);
-        u2.eval(env);
-    }
-}
-
-class SingleUpdate extends UpdateDecs {
-    UpdateDec u1;
-
-    public SingleUpdate(UpdateDec u1) {
-        this.u1 = u1;
-    }
-
-    public void eval(Environment env) {
-        u1.eval(env);
+        for(var v : u)
+            v.eval(env);
     }
 }
 
 class UpdateDec extends AST {
-   Variable var;
-   Expr e;
+    Variable vari;
+    List<Expr> e;
 
-   public UpdateDec(Variable var, Expr e) {
-       this.var = var;
-       this.e = e;
+    public UpdateDec(Variable vari, List<Expr> e) {
+        this.vari = vari;
+        this.e = e;
     }
 
     // Adds to variable to Environment
-   public void eval(Environment env) {
-       env.setVariable(var.varName, e.eval(env));
+    public void eval(Environment env) {
+        for(var v : e)
+            env.setVariable(vari.varname, v.eval(env));
     }
 }
 
-//-----------------------------------------------------------------------------------
-// Expressions
-//-----------------------------------------------------------------------------------
 abstract class Expr extends AST {
     abstract public Boolean eval(Environment env);
 }
@@ -379,36 +185,20 @@ class Disjunction extends Expr {
     }
 
     public Boolean eval(Environment env) {
-    return c1.eval(env) || c2.eval(env);
+        return c1.eval(env) || c2.eval(env);
     }
 }
 
+class Variable extends AST {
+    public String varname;
+    public List<Boolean> binaries;
 
-// Leaf of a tree
-class Variable extends Expr {
-    public String varName;
-
-    Variable(String varName) {
-        this.varName = varName;
+    Variable(String varname, List<Boolean> binaries) {
+        this.varname = varname;
+        this.binaries = binaries;
     }
 
-    public Boolean eval(Environment env) {
-        return env.getVariable(varName);
-    }
-}
-
-//-----------------------------------------------------------------------------------
-// Binary
-//-----------------------------------------------------------------------------------
-class Binary extends AST {
-    public Boolean binary;
-
-    Binary(Boolean binary) {
-        this.binary = binary;
-    }
-
-    public Boolean eval(Environment env) {
-        return binary;
+    public Boolean eval(Environemnt env) {
+        return env.getVariable(varname);
     }
 }
-
