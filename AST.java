@@ -111,7 +111,7 @@ class LatchDec extends AST {
     }
 
     public void initialize(Environment env) {
-        env.setVariable(output.varname, false);
+        env.setVariable(output.varname, new ArrayList<Boolean>());
     }
 
     public void nextCycle(Environment env) {
@@ -143,8 +143,10 @@ class UpdateDec extends AST {
 
     // Adds to variable to Environment
     public void eval(Environment env) {
-        for(var v : e)
-            env.setVariable(vari.varname, v.eval(env));
+        for(var v : e) {
+            vari.binaries.add(v.eval(env));
+            env.setVariable(vari.varname, vari.binaries);
+        }
     }
 }
 
@@ -232,10 +234,11 @@ class Variable extends AST {
     }
 
     Variable(String varname, String string) {
+        this.varname = varname;
         this.string = string; 
     }
 
-    public Boolean eval(Environment env) {
+    public List<Boolean> eval(Environment env) {
         return env.getVariable(varname);
     }
 }
