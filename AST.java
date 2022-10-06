@@ -11,7 +11,7 @@ class Prog extends AST {
     Hardware hardware;
     Input input;
     Output output;
-    List<LatchDec> latches;
+    List<Latch> latches;
     Update update;
     Simulate simulate;
 
@@ -19,7 +19,7 @@ class Prog extends AST {
             Hardware hardware,
             Input input,
             Output output,
-            List<LatchDec> latches,
+            List<Latch> latches,
             Update update,
             Simulate simulate) {
 
@@ -96,18 +96,18 @@ class Output extends AST {
 //     }
 // }
 
-class LatchDec extends AST {
+class Latch extends AST {
     Variable input;
     Variable output;
 
-    public LatchDec(Variable input, Variable output) {
+    public Latch(Variable input, Variable output) {
         this.input = input;
         this.output = output;
     }
 
     public void eval(Environment env) {
-        env.setVariable(input.varname, input.eval(env));
-        env.setVariable(output.varname, output.eval(env));
+        env.setVariable(input.varname, new ArrayList<Boolean>());
+        env.setVariable(output.varname, new ArrayList<Boolean>());
     }
 
     public void initialize(Environment env) {
