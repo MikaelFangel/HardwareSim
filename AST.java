@@ -43,14 +43,15 @@ class Prog extends AST {
 }
 
 class Hardware extends AST {
-    Variable var;
+    Variable vari;
 
-    public Hardware(Variable var) {
-        this.var = var;
+    public Hardware(Variable vari) {
+        this.vari = vari;
     }
 
     public void eval(Environment env) {
-        var.eval(env);
+        //vari.eval(env);
+        env.setVariable(vari.varname, new ArrayList<Boolean>());
     }
 }
 
@@ -63,7 +64,8 @@ class Input extends AST {
 
     public void eval(Environment env) {
         for(var v : li)
-            v.eval(env);
+            //v.eval(env);
+            env.setVariable(v.varname, new ArrayList<Boolean>());
     }
 }
 
@@ -76,7 +78,8 @@ class Output extends AST {
 
     public void eval(Environment env) {
         for(var v : outputs)
-            v.eval(env);
+            //v.eval(env);
+            env.setVariable(v.varname, new ArrayList<Boolean>());
     }
 }
 
@@ -166,18 +169,14 @@ class Simulate extends AST {
 
 class SimIn extends AST {
     Variable vari;
-    List<Variable> bList;
 
-    public SimIn(Variable vari, List<Variable> bList) {
+    public SimIn(Variable vari) {
         this.vari = vari;
-        this.bList = bList;
     }
 
     public void eval(Environment env) {
-        vari.eval(env);
-        for(Variable b : bList) {
-            b.eval(env);
-        }
+        //vari.eval(env);
+        env.setVariable(vari.varname, vari.binaries);
     }
 }
 
