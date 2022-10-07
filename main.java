@@ -109,8 +109,10 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
         List<SimIn> simIn = new ArrayList<>();
         List<Boolean> bList = new ArrayList<>(); 
         for (var s: ctx.s) {
-            for (var t : s.b)
-                bList.add(Boolean.parseBoolean(t.getText()));
+            for (var t : s.b) {
+                boolean bool = t.getText().equals("1");
+                bList.add(bool);
+            }
         }
         for (var s : ctx.s) {
             simIn.add(new SimIn(new Variable(s.getText(), bList)));
