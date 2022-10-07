@@ -50,8 +50,7 @@ class Hardware extends AST {
     }
 
     public void eval(Environment env) {
-        //vari.eval(env);
-        env.setVariable(vari.varname, new ArrayList<Boolean>());
+        vari.eval(env);
     }
 }
 
@@ -118,7 +117,7 @@ class Latch extends AST {
     }
 
     public void nextCycle(Environment env) {
-        env.setVariable(input.varname, output.eval(env));
+        //env.setVariable(input.varname, output.eval(env));
     }
 }
 
@@ -147,8 +146,8 @@ class UpdateDec extends AST {
     // Adds to variable to Environment
     public void eval(Environment env) {
         for(var v : e) {
-            vari.binaries.add(v.eval(env));
-            env.setVariable(vari.varname, vari.binaries);
+            //vari.binaries.add(v.eval(env));
+            env.setVariable(vari.varname, new ArrayList<Boolean>());
         }
     }
 }
@@ -222,7 +221,7 @@ class Disjunction extends Expr {
     }
 }
 
-class Variable extends AST {
+class Variable extends Expr {
     public String varname;
     public String string;
     public List<Boolean> binaries;
@@ -237,7 +236,8 @@ class Variable extends AST {
         this.string = string; 
     }
 
-    public List<Boolean> eval(Environment env) {
-        return env.getVariable(varname);
+    public Boolean eval(Environment env) {
+        env.setVariable(varname, binaries);
+        return true;
     }
 }
