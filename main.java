@@ -40,7 +40,8 @@ public class main {
         Prog result = (Prog) interpreter.visit(parseTree);
         Environment env = new Environment();
         result.eval(env);
-        System.out.println("The result is: " + env.toString());
+        result.runSimulator(env);
+        System.out.println(env.toString());
     }
 }
 
@@ -95,14 +96,14 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitUpdate(hwsimParser.UpdateContext ctx) {
-        List<UpdateDec> us = new ArrayList<>();
-        List<Expr> es = new ArrayList<>();
-        for(var v : ctx.u) {
-            for(var z : v.e)
-               es.add((Expr) visit(z)); 
-            us.add(new UpdateDec(new Variable(v.getText(), ""), es));
+        List<UpdateDec> updateDecList = new ArrayList<>();
+        List<Expr> exprList = new ArrayList<>();
+        for(var updateDec : ctx.u) {
+            for(var expr : updateDec.e)
+               exprList.add((Expr) visit(expr)); 
+            updateDecList.add((UpdateDec) visit(updateDec));
         }
-        return new Update(us);
+        return new Update(updateDecList);
     }
 
     public AST visitSimulate(hwsimParser.SimulateContext ctx) {
@@ -115,7 +116,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
             }
         }
         for (var s : ctx.s) {
-            simIn.add(new SimIn(new Variable(s.getText(), bList)));
+            simIn.add(new SimIn(new Variable(s.id.getText(), bList)));
         }
         return new Simulate(simIn);
     }
@@ -125,14 +126,16 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
         for (var b : ctx.b) {
             bList.add(Boolean.parseBoolean(b.getText()));
         }
+        System.out.println(ctx.id.getText());
         return new SimIn(new Variable(ctx.id.getText(), bList));
     }
 
     public AST visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
-        List<Expr> es = new ArrayList<>();
-        for(var v : ctx.e)
-            es.add((Expr) visit(v));
-        return new UpdateDec(new Variable(ctx.id.getText(), ""), es);
+        List<Expr> exprList = new ArrayList<>();
+        for(var expr : ctx.e)
+            exprList.add((Expr) visit(expr));
+        //return new UpdateDec(new Variable(ctx.id.getText(), ""), exprList);
+        return new UpdateDec(new Variable(ctx.id.getText(), ""), exprList);
     }
 
     public AST visitNegation(hwsimParser.NegationContext ctx) {
