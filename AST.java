@@ -34,18 +34,20 @@ class Prog extends AST {
     public void eval(Environment env) {
         hardware.eval(env);
         input.eval(env);
+        for(Latch l : latches)
+            l.eval(env);
         output.eval(env);
-        /*for(var v : latches)
-            v.eval(env);
-        update.eval(env);*/
         simulate.eval(env);
     }
+
     public void runSimulator(Environment env) {
         for(var l : latches) {
             l.initialize(env);
         }
-        //simulate.initialize(env);
-        //simulate.nextCycle(env);
+        update.eval(env);
+        /*for (int i = 0; i < 1; i++) {
+            l.nextCycle(env, i);
+        }*/
     }
 }
 
@@ -71,7 +73,6 @@ class Input extends AST {
     public void eval(Environment env) {
         for(var v : li)
             v.eval(env);
-            //env.setVariable(v.varname, new ArrayList<Boolean>());
     }
 }
 
@@ -83,27 +84,11 @@ class Output extends AST {
     }
 
     public void eval(Environment env) {
-        for(var v : outputs)
+        for(var v : outputs){
             v.eval(env);
-            //env.setVariable(v.varname, new ArrayList<Boolean>());
+        }
     }
 }
-
-// Maybe not needed
-// class Latches extends AST {
-//     Latch l;
-//     Latches ls;
-// 
-//     public Latches(Latch l, Latches ls) {
-//         this.l = l;
-//         this.ls = ls;
-//     }
-// 
-//     public void eval(Environment env) {
-//         l.eval(env);
-//         ls.eval(env);
-//     }
-// }
 
 class Latch extends AST {
     Variable input;
@@ -117,17 +102,17 @@ class Latch extends AST {
     public void eval(Environment env) {
         input.eval(env);
         output.eval(env);
-        /*env.setVariable(input.varname, new ArrayList<Boolean>());
-        env.setVariable(output.varname, new ArrayList<Boolean>());*/
     }
-
+    
     public void initialize(Environment env) {
-        //env.setVariable(output.varname, new ArrayList<Boolean>());
-        output.eval(env);
+        List<Boolean> outputBinaries = env.getVariable(output.varname);
+        outputBinaries.add(false);
     }
 
-    public void nextCycle(Environment env) {
-        //env.setVariable(input.varname, output.eval(env));
+    public void nextCycle(Environment env, int cycle) {
+        List<Boolean> inputBinaries = env.getVariable(input.varname);
+        List<Boolean> outputBinaries = env.getVariable(output.varname);
+        outputBinaries.add(inputBinaries.get(inputBinaries.size()-1));
     }
 }
 
@@ -155,8 +140,10 @@ class UpdateDec extends AST {
 
     // Adds to variable to Environment
     public void eval(Environment env) {
+        System.out.println(vari.varname);
+        vari.eval(env);
         for(var v : e) {
-            vari.eval(env);
+            v.eval(env);
         }
     }
 }
