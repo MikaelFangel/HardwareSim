@@ -38,10 +38,9 @@ public class main {
         // Construct an interpreter and run it on the parse tree
         Interpreter interpreter = new Interpreter();
         Prog result = (Prog) interpreter.visit(parseTree);
-        // result.eval(new Environment());
-        System.out.println("The result is: ");
-        result.eval(new Environment());
-
+        Environment env = new Environment();
+        result.eval(env);
+        System.out.println("The result is: " + env.toString());
     }
 }
 
@@ -70,7 +69,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
    public AST visitHardware(hwsimParser.HardwareContext ctx) {
-        return new Hardware(new Variable(".hardware", ctx.id.getText()));
+        return new Hardware(new Variable(ctx.id.getText(), "Something else.."));
     }
 
     public AST visitInput(hwsimParser.InputContext ctx) {

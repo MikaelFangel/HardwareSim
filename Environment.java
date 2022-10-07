@@ -22,7 +22,7 @@ class Environment {
     public String toString() {
         String table = "";
         for (Entry<String, List<Boolean>> entry : variableValues.entrySet()) {
-            table += entry.getKey() + "\t-> " + entry.getValue().get(0) + "\n";
+            table += entry.getKey() + "\t-> " + entry.getValue() + "\n";
         }
         return table;
     }
