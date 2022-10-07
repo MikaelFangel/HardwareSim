@@ -147,7 +147,7 @@ class UpdateDec extends AST {
     // Adds to variable to Environment
     public void eval(Environment env) {
         for(var v : e) {
-            //vari.binaries.add(v.eval(env));
+            vari.binaries.add(v.eval(env));
             env.setVariable(vari.varname, vari.binaries);
         }
     }
@@ -181,7 +181,7 @@ class SimIn extends AST {
 }
 
 abstract class Expr extends AST {
-    abstract public List<Boolean> eval(Environment env);
+    abstract public Boolean eval(Environment env);
 }
 
 class Negation extends Expr {
@@ -191,12 +191,8 @@ class Negation extends Expr {
         this.c1 = c1;
     }
 
-    public List<Boolean> eval(Environment env) {
-        List<Boolean> negatedBinaries = new ArrayList<>();
-        for(Boolean b : c1.eval(env)) {
-            negatedBinaries.add(!b);
-        }
-        return negatedBinaries;
+    public Boolean eval(Environment env) {
+        return !c1.eval(env);
     }
 }
 
@@ -208,15 +204,8 @@ class Conjunction extends Expr {
         this.c2 = c2;
     }
 
-    public List<Boolean> eval(Environment env) {
-        List<Boolean> b1 = c1.eval(env);
-        List<Boolean> b2 = c2.eval(env);
-        List<Boolean> andBinaries = new ArrayList<>();
-        for(int i = 0; i < b1.size() && i < b2.size(); i++) {
-            andBinaries.add(b1.get(i) && b2.get(i));
-        }
-        return andBinaries;
-        //return c1.eval(env) && c2.eval(env);
+    public Boolean eval(Environment env) {
+        return c1.eval(env) && c2.eval(env);
     }
 }
 
@@ -228,19 +217,12 @@ class Disjunction extends Expr {
         this.c2 = c2;
     }
 
-    public List<Boolean> eval(Environment env) {
-        List<Boolean> b1 = c1.eval(env);
-        List<Boolean> b2 = c2.eval(env);
-        List<Boolean> orBinaries = new ArrayList<>();
-        for(int i = 0; i < b1.size() && i < b2.size(); i++) {
-            orBinaries.add(b1.get(i) || b2.get(i));
-        }
-        return orBinaries;
-        //return c1.eval(env) || c2.eval(env);
+    public Boolean eval(Environment env) {
+        return c1.eval(env) || c2.eval(env);
     }
 }
 
-class Variable extends Expr {
+class Variable extends AST {
     public String varname;
     public String string;
     public List<Boolean> binaries;
