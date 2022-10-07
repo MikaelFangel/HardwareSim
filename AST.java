@@ -43,11 +43,11 @@ class Prog extends AST {
     public void runSimulator(Environment env) {
         for(var l : latches) {
             l.initialize(env);
+            for (int i = 0; i < 4; i++) {
+                update.eval(env);
+                l.nextCycle(env, i);
+            }
         }
-        update.eval(env);
-        /*for (int i = 0; i < 1; i++) {
-            l.nextCycle(env, i);
-        }*/
     }
 }
 
@@ -59,7 +59,7 @@ class Hardware extends AST {
     }
 
     public void eval(Environment env) {
-        vari.eval(env);
+        env.setVariable(vari.varname, "");
     }
 }
 
@@ -72,7 +72,7 @@ class Input extends AST {
 
     public void eval(Environment env) {
         for(var v : li)
-            v.eval(env);
+            env.setVariable(v.varname, "");
     }
 }
 
@@ -85,7 +85,7 @@ class Output extends AST {
 
     public void eval(Environment env) {
         for(var v : outputs){
-            v.eval(env);
+            env.setVariable(v.varname, "");
         }
     }
 }
@@ -100,19 +100,21 @@ class Latch extends AST {
     }
 
     public void eval(Environment env) {
-        input.eval(env);
-        output.eval(env);
+        env.setVariable(input.varname, "");
+        env.setVariable(output.varname, "");
     }
     
     public void initialize(Environment env) {
-        List<Boolean> outputBinaries = env.getVariable(output.varname);
-        outputBinaries.add(false);
+        String outputBinaries = env.getVariable(output.varname);
+        outputBinaries += '0';
+        env.setVariable(output.varname, outputBinaries);
     }
 
     public void nextCycle(Environment env, int cycle) {
-        List<Boolean> inputBinaries = env.getVariable(input.varname);
-        List<Boolean> outputBinaries = env.getVariable(output.varname);
-        outputBinaries.add(inputBinaries.get(inputBinaries.size()-1));
+        String inputBinaries = env.getVariable(input.varname);
+        String outputBinaries = env.getVariable(output.varname);
+        outputBinaries += inputBinaries.charAt(inputBinaries.length()-1);
+        env.setVariable(output.varname, outputBinaries);
     }
 }
 
@@ -130,20 +132,21 @@ class Update extends AST {
 }
 
 class UpdateDec extends AST {
-    Variable vari;
-    List<Expr> e;
+    String vari;
+    List<Expr> exprList;
 
-    public UpdateDec(Variable vari, List<Expr> e) {
+    public UpdateDec(String vari, List<Expr> exprList) {
         this.vari = vari;
-        this.e = e;
+        this.exprList = exprList;
     }
 
     // Adds to variable to Environment
     public void eval(Environment env) {
-        System.out.println(vari.varname);
-        vari.eval(env);
-        for(var v : e) {
-            v.eval(env);
+        for(var expr : exprList) {
+            String binaries = env.getVariable(vari);
+            binaries += expr.eval(env);
+            env.setVariable(vari, binaries);
+            //expr.eval(env);
         }
     }
 }
@@ -164,18 +167,20 @@ class Simulate extends AST {
 
 class SimIn extends AST {
     Variable vari;
+    String binaries;
 
-    public SimIn(Variable vari) {
+    public SimIn(Variable vari, String binaries) {
         this.vari = vari;
+        this.binaries = binaries;
     }
 
     public void eval(Environment env) {
-        vari.eval(env);
+        env.setVariable(vari.varname, binaries);
     }
 }
 
 abstract class Expr extends AST {
-    abstract public Boolean eval(Environment env);
+    abstract public String eval(Environment env);
 }
 
 class Negation extends Expr {
@@ -185,8 +190,10 @@ class Negation extends Expr {
         this.c1 = c1;
     }
 
-    public Boolean eval(Environment env) {
-        return !c1.eval(env);
+    public String eval(Environment env) {
+        if(c1.eval(env).equals("0"))
+            return "1";
+        return "0";
     }
 }
 
@@ -198,8 +205,10 @@ class Conjunction extends Expr {
         this.c2 = c2;
     }
 
-    public Boolean eval(Environment env) {
-        return c1.eval(env) && c2.eval(env);
+    public String eval(Environment env) {
+        if(c1.eval(env).equals("1") && c2.eval(env).equals("1"))
+            return "1";
+        return "0";
     }
 }
 
@@ -211,17 +220,39 @@ class Disjunction extends Expr {
         this.c2 = c2;
     }
 
-    public Boolean eval(Environment env) {
-        return c1.eval(env) || c2.eval(env);
+    public String eval(Environment env) {
+        if(c1.eval(env).equals("0") && c2.eval(env).equals("0"))
+            return "0";
+        return "1";
     }
 }
 
 class Variable extends Expr {
+    String varname;
+    int i = 0;
+
+    public Variable(String varname) {
+        this.varname = varname;
+    }
+
+    public String eval(Environment env) {
+        System.out.println(varname);
+        if(varname.equals("Reset")) {
+            String string = env.getVariable(varname);
+            String result = string.charAt(i) + "";
+            i++;
+            return result;
+        }
+        return env.getVariable(varname);
+    }
+}
+
+/*class Variable extends Expr {
     public String varname;
     public String string;
-    public List<Boolean> binaries;
+    public String binaries;
 
-    Variable(String varname, List<Boolean> binaries) {
+    Variable(String varname, String binaries) {
         this.varname = varname;
         this.binaries = binaries;
     }
@@ -231,8 +262,8 @@ class Variable extends Expr {
         this.string = string; 
     }
 
-    public Boolean eval(Environment env) {
+    public String eval(Environment env) {
         env.setVariable(varname, binaries);
         return true;
     }
-}
+}*/
