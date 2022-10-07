@@ -35,10 +35,17 @@ class Prog extends AST {
         hardware.eval(env);
         input.eval(env);
         output.eval(env);
-        for(var v : latches)
+        /*for(var v : latches)
             v.eval(env);
-        update.eval(env);
+        update.eval(env);*/
         simulate.eval(env);
+    }
+    public void runSimulator(Environment env) {
+        for(var l : latches) {
+            l.initialize(env);
+        }
+        //simulate.initialize(env);
+        //simulate.nextCycle(env);
     }
 }
 
@@ -63,8 +70,8 @@ class Input extends AST {
 
     public void eval(Environment env) {
         for(var v : li)
-            //v.eval(env);
-            env.setVariable(v.varname, new ArrayList<Boolean>());
+            v.eval(env);
+            //env.setVariable(v.varname, new ArrayList<Boolean>());
     }
 }
 
@@ -77,8 +84,8 @@ class Output extends AST {
 
     public void eval(Environment env) {
         for(var v : outputs)
-            //v.eval(env);
-            env.setVariable(v.varname, new ArrayList<Boolean>());
+            v.eval(env);
+            //env.setVariable(v.varname, new ArrayList<Boolean>());
     }
 }
 
@@ -108,12 +115,15 @@ class Latch extends AST {
     }
 
     public void eval(Environment env) {
-        env.setVariable(input.varname, new ArrayList<Boolean>());
-        env.setVariable(output.varname, new ArrayList<Boolean>());
+        input.eval(env);
+        output.eval(env);
+        /*env.setVariable(input.varname, new ArrayList<Boolean>());
+        env.setVariable(output.varname, new ArrayList<Boolean>());*/
     }
 
     public void initialize(Environment env) {
-        env.setVariable(output.varname, new ArrayList<Boolean>());
+        //env.setVariable(output.varname, new ArrayList<Boolean>());
+        output.eval(env);
     }
 
     public void nextCycle(Environment env) {
@@ -146,8 +156,7 @@ class UpdateDec extends AST {
     // Adds to variable to Environment
     public void eval(Environment env) {
         for(var v : e) {
-            //vari.binaries.add(v.eval(env));
-            env.setVariable(vari.varname, new ArrayList<Boolean>());
+            vari.eval(env);
         }
     }
 }
@@ -174,8 +183,7 @@ class SimIn extends AST {
     }
 
     public void eval(Environment env) {
-        //vari.eval(env);
-        env.setVariable(vari.varname, vari.binaries);
+        vari.eval(env);
     }
 }
 
