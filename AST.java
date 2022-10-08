@@ -59,7 +59,8 @@ class Prog extends AST {
 
     public void runSimulator(Environment env) {
         initialize(env);
-        int bitLength = env.getVariable(simulate.simIn.get(0).variable).length();
+        //TODO: What if multiple input strings?
+        int bitLength = simulate.simIn.get(0).inputSignal.length();
         while(cycle < bitLength) {
             nextCycle(env);
             cycle++;

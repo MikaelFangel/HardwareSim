@@ -10,11 +10,10 @@ class Environment {
         variableValues.put(name, value);
     }
 
-    public String getVariable(String name) {
+    public String getVariable(String name) throws Exception {
         String value = variableValues.get(name);
         if (value == null) {
-            System.err.println("Variable not defined: " + name);
-            System.exit(1);
+            throw new Exception("Variable not defined" + name);
         }
         return value;
     }
