@@ -14,6 +14,8 @@ class Prog extends AST {
     List<Latch> latches;
     Update update;
     Simulate simulate;
+    // Glocal variable for keeping track of the current cycle
+    public static int cycle = 0;
 
     public Prog(
             Hardware hardware,
@@ -41,32 +43,26 @@ class Prog extends AST {
     }
 
     public void initialize(Environment env) {
-        // Read input signal
-        SimIn simIn = simulate.simIn.get(0);
-        String inputSignal = simIn.binaries.charAt(0) + "";
-        env.setVariable(simIn.variable, inputSignal);
         // Initialize latches to 0
         for(var l : latches) {
             l.initialize(env);
         }
     }
 
-    public void nextCycle(Environment env, int i) {
-        // Read input signal at cycle i
-        SimIn simIn = simulate.simIn.get(0);
-        String inputSignal = simIn.binaries.charAt(i) + "";
-        env.setVariable(simIn.variable, inputSignal);
+    public void nextCycle(Environment env) {
         // Execute all update statements
         update.eval(env);
         // Execute all latches
         for(var l : latches)
-            l.nextCycle(env, i);
+            l.nextCycle(env);
     }
 
     public void runSimulator(Environment env) {
         initialize(env);
-        for (int i = 0; i < simulate.simIn.get(0).binaries.length(); i++) {
-            nextCycle(env, i);
+        int bitLength = env.getVariable(simulate.simIn.get(0).variable).length();
+        while(cycle < bitLength) {
+            nextCycle(env);
+            cycle++;
         }
     }
 }
@@ -90,6 +86,7 @@ class Input extends AST {
         this.li = li;
     }
 
+    // Initialize input variables in hashmap
     public void eval(Environment env) {
         for(var v : li)
             env.setVariable(v.varname, "");
@@ -103,6 +100,7 @@ class Output extends AST {
         this.outputs = outputs;
     }
 
+    // Initialize output variables in hashmap
     public void eval(Environment env) {
         for(var v : outputs){
             env.setVariable(v.varname, "");
@@ -132,7 +130,7 @@ class Latch extends AST {
     }
 
     // Set the output value to the current value of the input 
-    public void nextCycle(Environment env, int cycle) {
+    public void nextCycle(Environment env) {
         String inputBitString = env.getVariable(input.varname);
         String outputBitString = env.getVariable(output.varname);
         // getVariable returns the full bitstring. We use charAt to get the current inputbit, and add to the output bitstring.
