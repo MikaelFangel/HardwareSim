@@ -1,15 +1,27 @@
-.hardware helloworld
+.hardware traffiklys
 
-// Minimal eksempel.
+// Minimal traffiklys eksempel.
 
-.inputs Reset
-.outputs Oscillator
+.inputs Button
+.outputs Red Green PRed PGreen
 
-.latch Oscillator -> OscillatorM
+.latch Red -> RedM
 
 .update
 
-Oscillator = !OscillatorM && !Reset
+Red = !RedM && Button
+Green  = !Red 
+PGreen = Red 
+PRed   = !PGreen
 
-.simulate
-Reset=0000100
+.simulate Button=1100110111
+
+/* The simulator output should look something like this:
+
+1100110111 Button
+1000100101 Red
+0111011010 Green
+0111011010 PRed
+1000100101 PGreen
+
+*/
