@@ -166,7 +166,13 @@ class UpdateDec extends AST {
 
     // eval expr and add the result to the bitstring. Store in hashmap
     public void eval(Environment env) {
-        String binaries = env.getVariable(vari);
+    String binaries;
+        try {
+             binaries = env.getVariable(vari);
+        } catch(Exception e) {
+            binaries = "";
+            env.setVariable(vari, binaries);
+        }
         for(var expr : exprList) {
             binaries += expr.eval(env);
         }
@@ -260,7 +266,13 @@ class Variable extends Expr {
 
     // Get the current cycle bit from varname
     public String eval(Environment env) {
-        String bitString = env.getVariable(varname);
+        String bitString;
+        try {
+            bitString = env.getVariable(varname);
+        } catch(Exception e) {
+            bitString = "";
+            env.setVariable(varname, bitString);
+        }
         String bit = bitString.charAt(Prog.cycle) + "";
         return bit;
     }
