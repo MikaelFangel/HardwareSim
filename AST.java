@@ -191,16 +191,16 @@ class Simulate extends AST {
 
 class SimIn extends AST {
     public String variable;
-    public String binaries;
+    public String inputSignal;
 
-    public SimIn(String variable, String binaries) {
+    public SimIn(String variable, String inputSignal) {
         this.variable = variable;
-        this.binaries = binaries;
+        this.inputSignal = inputSignal;
     }
 
+    // Store the input bitstring in hashmap
     public void eval(Environment env) {
-        // TODO: Discuss what we need to do here. Right now SimIn is just used to hold the input bitstring
-        //env.setVariable(vari.varname, binaries);
+        env.setVariable(variable, inputSignal);
     }
 }
 
@@ -216,10 +216,7 @@ class Negation extends Expr {
     }
 
     public String eval(Environment env) {
-        // eval returns the full bitstring, we use charAt to get the last bit
-        String b1 = c1.eval(env);
-        String r1 = b1.charAt(b1.length()-1) + "";
-        if(r1.equals("0"))
+        if(c1.eval(env).equals("0"))
             return "1";
         return "0";
     }
@@ -234,12 +231,7 @@ class Conjunction extends Expr {
     }
 
     public String eval(Environment env) {
-        // eval returns the full bitstring, we use charAt to get the last bit
-        String b1 = c1.eval(env);
-        String b2 = c2.eval(env);
-        String r1 = b1.charAt(b1.length()-1) + "";
-        String r2 = b2.charAt(b2.length()-1) + "";
-        if(r1.equals("1") && r2.equals("1"))
+        if(c1.eval(env).equals("1") && c2.eval(env).equals("1"))
             return "1";
         return "0";
     }
@@ -254,12 +246,7 @@ class Disjunction extends Expr {
     }
 
     public String eval(Environment env) {
-        // eval returns the full bitstring, we use charAt to get the last bit
-        String b1 = c1.eval(env);
-        String b2 = c2.eval(env);
-        String r1 = b1.charAt(b1.length()-1) + "";
-        String r2 = b2.charAt(b2.length()-1) + "";
-        if(r1.equals("0") && r2.equals("0"))
+        if(c1.eval(env).equals("0") && c2.eval(env).equals("0"))
             return "0";
         return "1";
     }
@@ -272,8 +259,10 @@ class Variable extends Expr {
         this.varname = varname;
     }
 
+    // Get the current cycle bit from varname
     public String eval(Environment env) {
-        // TODO: We could store the whole input bitstring in hashmap and get last bit here
-        return env.getVariable(varname);
+        String bitString = env.getVariable(varname);
+        String bit = bitString.charAt(Prog.cycle) + "";
+        return bit;
     }
 }
