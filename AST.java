@@ -186,16 +186,17 @@ class Simulate extends AST {
 }
 
 class SimIn extends AST {
-    Variable vari;
-    String binaries;
+    public String variable;
+    public String binaries;
 
-    public SimIn(Variable vari, String binaries) {
-        this.vari = vari;
+    public SimIn(String variable, String binaries) {
+        this.variable = variable;
         this.binaries = binaries;
     }
 
     public void eval(Environment env) {
-        env.setVariable(vari.varname, binaries);
+        // TODO: Discuss what we need to do here. Right now SimIn is just used to hold the input bitstring
+        //env.setVariable(vari.varname, binaries);
     }
 }
 
