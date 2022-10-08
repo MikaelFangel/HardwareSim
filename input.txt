@@ -1,27 +1,35 @@
-.hardware traffiklys
+.hardware trafiklys
 
-// Minimal traffiklys eksempel.
+// Trafiklys eksempel.
 
 .inputs Button
-.outputs Red Green PRed PGreen
+.outputs Red Yel Green PRed PGreen
 
 .latch Red -> RedM
+.latch Yel -> YelM
+.latch Req -> ReqM
 
 .update
 
-Red = !RedM && Button
-Green  = !Red 
-PGreen = Red 
+Clr = RedM && !YelM
+Req = (ReqM || Button) && !Clr
+Red = !RedM && YelM || RedM && !YelM
+Yel = !RedM && !YelM && Req || RedM && !YelM
+Green  = !Red && !Yel
+PGreen = Red && !Yel
 PRed   = !PGreen
 
-.simulate Button=1100110111
+.simulate Button=001001111001
 
-/* The simulator output should look something like this:
+/*
 
-1100110111 Button
-1000100101 Red
-0111011010 Green
-0111011010 PRed
-1000100101 PGreen
+Expected output of the simulator:
+
+001001111001 Button
+000110011000 Red
+001010101001 Yel
+110001000110 Green
+111011101111 PRed
+000100010000 PGreen
 
 */
