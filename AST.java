@@ -273,6 +273,7 @@ class Variable extends Expr {
     }
 
     public String eval(Environment env) {
+        // TODO: We could store the whole input bitstring in hashmap and get last bit here
         return env.getVariable(varname);
     }
 }
