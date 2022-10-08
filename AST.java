@@ -40,13 +40,33 @@ class Prog extends AST {
         simulate.eval(env);
     }
 
-    public void runSimulator(Environment env) {
+    public void initialize(Environment env) {
+        // Read input signal
+        SimIn simIn = simulate.simIn.get(0);
+        String inputSignal = simIn.binaries.charAt(0) + "";
+        env.setVariable(simIn.variable, inputSignal);
+        // Initialize latches to 0
         for(var l : latches) {
             l.initialize(env);
-            for (int i = 0; i < 4; i++) {
-                update.eval(env);
-                l.nextCycle(env, i);
-            }
+        }
+    }
+
+    public void nextCycle(Environment env, int i) {
+        // Read input signal at cycle i
+        SimIn simIn = simulate.simIn.get(0);
+        String inputSignal = simIn.binaries.charAt(i) + "";
+        env.setVariable(simIn.variable, inputSignal);
+        // Execute all update statements
+        update.eval(env);
+        // Execute all latches
+        for(var l : latches)
+            l.nextCycle(env, i);
+    }
+
+    public void runSimulator(Environment env) {
+        initialize(env);
+        for (int i = 0; i < simulate.simIn.get(0).binaries.length(); i++) {
+            nextCycle(env, i);
         }
     }
 }
