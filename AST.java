@@ -191,7 +191,10 @@ class Negation extends Expr {
     }
 
     public String eval(Environment env) {
-        if(c1.eval(env).equals("0"))
+        // eval returns the full bitstring, we use charAt to get the last bit
+        String b1 = c1.eval(env);
+        String r1 = b1.charAt(b1.length()-1) + "";
+        if(r1.equals("0"))
             return "1";
         return "0";
     }
@@ -206,7 +209,12 @@ class Conjunction extends Expr {
     }
 
     public String eval(Environment env) {
-        if(c1.eval(env).equals("1") && c2.eval(env).equals("1"))
+        // eval returns the full bitstring, we use charAt to get the last bit
+        String b1 = c1.eval(env);
+        String b2 = c2.eval(env);
+        String r1 = b1.charAt(b1.length()-1) + "";
+        String r2 = b2.charAt(b2.length()-1) + "";
+        if(r1.equals("1") && r2.equals("1"))
             return "1";
         return "0";
     }
@@ -221,7 +229,12 @@ class Disjunction extends Expr {
     }
 
     public String eval(Environment env) {
-        if(c1.eval(env).equals("0") && c2.eval(env).equals("0"))
+        // eval returns the full bitstring, we use charAt to get the last bit
+        String b1 = c1.eval(env);
+        String b2 = c2.eval(env);
+        String r1 = b1.charAt(b1.length()-1) + "";
+        String r2 = b2.charAt(b2.length()-1) + "";
+        if(r1.equals("0") && r2.equals("0"))
             return "0";
         return "1";
     }
