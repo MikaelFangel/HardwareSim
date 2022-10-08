@@ -124,17 +124,20 @@ class Latch extends AST {
         env.setVariable(output.varname, "");
     }
     
+    // Initialize the output bitstring with 0
     public void initialize(Environment env) {
         String outputBinaries = env.getVariable(output.varname);
         outputBinaries += '0';
         env.setVariable(output.varname, outputBinaries);
     }
 
+    // Set the output value to the current value of the input 
     public void nextCycle(Environment env, int cycle) {
-        String inputBinaries = env.getVariable(input.varname);
-        String outputBinaries = env.getVariable(output.varname);
-        outputBinaries += inputBinaries.charAt(inputBinaries.length()-1);
-        env.setVariable(output.varname, outputBinaries);
+        String inputBitString = env.getVariable(input.varname);
+        String outputBitString = env.getVariable(output.varname);
+        // getVariable returns the full bitstring. We use charAt to get the current inputbit, and add to the output bitstring.
+        outputBitString += inputBitString.charAt(inputBitString.length()-1);
+        env.setVariable(output.varname, outputBitString);
     }
 }
 
@@ -145,6 +148,7 @@ class Update extends AST {
         this.u = u;
     }
     
+    // eval all update declarations
     public void eval(Environment env) {
         for(var v : u)
             v.eval(env);
@@ -160,14 +164,14 @@ class UpdateDec extends AST {
         this.exprList = exprList;
     }
 
-    // Adds to variable to Environment
+
+    // eval expr and add the result to the bitstring. Store in hashmap
     public void eval(Environment env) {
+        String binaries = env.getVariable(vari);
         for(var expr : exprList) {
-            String binaries = env.getVariable(vari);
             binaries += expr.eval(env);
-            env.setVariable(vari, binaries);
-            //expr.eval(env);
         }
+        env.setVariable(vari, binaries);
     }
 }
 
@@ -263,41 +267,12 @@ class Disjunction extends Expr {
 
 class Variable extends Expr {
     String varname;
-    int i = 0;
 
     public Variable(String varname) {
         this.varname = varname;
     }
 
     public String eval(Environment env) {
-        System.out.println(varname);
-        if(varname.equals("Reset")) {
-            String string = env.getVariable(varname);
-            String result = string.charAt(i) + "";
-            i++;
-            return result;
-        }
         return env.getVariable(varname);
     }
 }
-
-/*class Variable extends Expr {
-    public String varname;
-    public String string;
-    public String binaries;
-
-    Variable(String varname, String binaries) {
-        this.varname = varname;
-        this.binaries = binaries;
-    }
-
-    Variable(String varname, String string) {
-        this.varname = varname;
-        this.string = string; 
-    }
-
-    public String eval(Environment env) {
-        env.setVariable(varname, binaries);
-        return true;
-    }
-}*/
