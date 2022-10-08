@@ -125,15 +125,33 @@ class Latch extends AST {
     
     // Initialize the output bitstring with 0
     public void initialize(Environment env) {
-        String outputBinaries = env.getVariable(output.varname);
+        String outputBinaries;
+        try {
+             outputBinaries = env.getVariable(output.varname);
+        } catch(Exception e) {
+            outputBinaries = "";
+            env.setVariable(output.varname, outputBinaries);
+        }
         outputBinaries += '0';
         env.setVariable(output.varname, outputBinaries);
     }
 
     // Set the output value to the current value of the input 
     public void nextCycle(Environment env) {
-        String inputBitString = env.getVariable(input.varname);
-        String outputBitString = env.getVariable(output.varname);
+        String inputBitString;
+        String outputBitString;
+        try {
+             inputBitString = env.getVariable(input.varname);
+        } catch(Exception e) {
+            inputBitString = "";
+            env.setVariable(output.varname, inputBitString);
+        }
+        try {
+             outputBitString = env.getVariable(output.varname);
+        } catch(Exception e) {
+            outputBitString = "";
+            env.setVariable(output.varname, outputBitString);
+        }
         // getVariable returns the full bitstring. We use charAt to get the current inputbit, and add to the output bitstring.
         outputBitString += inputBitString.charAt(inputBitString.length()-1);
         env.setVariable(output.varname, outputBitString);
