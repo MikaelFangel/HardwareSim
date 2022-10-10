@@ -89,8 +89,10 @@ class Input extends AST {
 
     // Initialize input variables in hashmap
     public void eval(Environment env) {
-        for(var v : li)
+        for(var v : li) {
             env.setVariable(v.varname, "");
+            env.setOutput(v.varname);
+        }
     }
 }
 
