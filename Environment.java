@@ -19,10 +19,10 @@ class Environment {
     }
 
     public String toString() {
-        String table = "";
+        StringBuilder table = new StringBuilder();
         for (Entry<String, String> entry : variableValues.entrySet()) {
-            table += entry.getKey() + "\t-> " + entry.getValue() + "\n";
+            table.append(entry.getValue() + "\t" + entry.getKey() + "\n");
         }
-        return table;
+        return table.toString();
     }
 }
