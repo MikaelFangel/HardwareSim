@@ -105,6 +105,7 @@ class Output extends AST {
     public void eval(Environment env) {
         for(var v : outputs){
             env.setVariable(v.varname, "");
+            env.setOutput(v.varname);
         }
     }
 }

@@ -5,9 +5,14 @@ import java.util.List;
 
 class Environment {
     private HashMap<String, String> variableValues = new HashMap<>();
+    private List<String> outputNames = new ArrayList<>();
 
     public void setVariable(String name, String value) {
         variableValues.put(name, value);
+    }
+
+    public void setOutput(String varname) {
+        outputNames.add(varname);
     }
 
     public String getVariable(String name) throws Exception {
@@ -20,9 +25,10 @@ class Environment {
 
     public String toString() {
         StringBuilder table = new StringBuilder();
-        for (Entry<String, String> entry : variableValues.entrySet()) {
-            table.append(entry.getValue() + "\t" + entry.getKey() + "\n");
+        for (String s : outputNames) {
+            table.append(variableValues.get(s) + "\t" + s + "\n");
         }
+
         return table.toString();
     }
 }
