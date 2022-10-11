@@ -1,0 +1,44 @@
+.hardware trafiklys
+
+// Trafiklys eksempel.
+
+.inputs Button 
+.outputs Red Yel Green PRed PGreen Clr Liveness
+
+.latch Red -> RedM
+.latch Yel -> YelM
+.latch Req -> ReqM
+
+// For storing previous cyclic values of Red || Yel in Latch Memory to check for liveness
+// M1 is the most recent bit and M4 is n-4th bit
+.latch M3 -> M4
+.latch M2 -> M3
+.latch M1 -> M2
+
+.update
+
+Clr = (RedM && !YelM)
+Req = (ReqM || Button) && !Clr
+Red = !RedM && YelM || RedM && !YelM 
+Yel = !RedM && !YelM && Req || RedM && !YelM
+Green  = !Red && !Yel
+PGreen = Red && !Yel
+PRed   = !PGreen
+M1 = Red || Yel
+
+// Check for liveness if 4 of the last bits cars had red or yellow
+Liveness = M1 && M2 && M3 && M4
+
+.simulate Button=111111111111
+/*
+
+Expected output of the simulator:
+
+001001111001 Button
+000110011000 Red
+001010101001 Yel
+110001000110 Green
+111011101111 PRed
+000100010000 PGreen
+
+*/
