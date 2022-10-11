@@ -70,14 +70,14 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
    public AST visitHardware(hwsimParser.HardwareContext ctx) {
-        return new Hardware(new Variable(ctx.id.getText()));
+        return new Hardware(new Variable(ctx.id.getText(), ".hardware"));
     }
 
     public AST visitInput(hwsimParser.InputContext ctx) {
         List<Variable> ins = new ArrayList<>();
         List<Boolean> b = new ArrayList<>();
         for(var v : ctx.id)
-            ins.add(new Variable(v.getText()));
+            ins.add(new Variable(v.getText(), ".input"));
 
         return new Input(ins);
     }
@@ -85,12 +85,12 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     public AST visitOutput(hwsimParser.OutputContext ctx) {
         List<Variable> outs = new ArrayList<>();
         for(var v : ctx.id)
-            outs.add(new Variable(v.getText()));
+            outs.add(new Variable(v.getText(), ".output"));
         return new Output(outs);
     }
 
     public AST visitLatch(hwsimParser.LatchContext ctx) {
-        return new Latch(new Variable(ctx.id1.getText()), new Variable(ctx.id2.getText()));
+        return new Latch(new Variable(ctx.id1.getText(), new ArrayList<>()), new Variable(ctx.id2.getText(), new ArrayList<>()));
     }
 
     public AST visitUpdate(hwsimParser.UpdateContext ctx) {
@@ -109,9 +109,9 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
     
     public AST visitSimIn(hwsimParser.SimInContext ctx) {
-        String binaries = "";
+        List<Boolean> binaries = new ArrayList<>();
         for (var b : ctx.b) {
-            binaries += b.getText();
+            binaries.add(Boolean.parseBoolean(b.getText()));
         }
         return new SimIn(ctx.id.getText(), binaries);
     }
@@ -140,6 +140,6 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitVariable(hwsimParser.VariableContext ctx) {
-        return new Variable(ctx.x.getText());
+        return new Variable(ctx.x.getText(), new ArrayList<>());
     }
 }

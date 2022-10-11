@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Environment {
-    private HashMap<String, String> variableValues = new HashMap<>();
+    private HashMap<String, List<Boolean>> variableValues = new HashMap<>();
     private List<String> outputNames = new ArrayList<>();
 
-    public void setVariable(String name, String value) {
+    public void setVariable(String name, List<Boolean> value) {
         variableValues.put(name, value);
     }
 
@@ -15,20 +15,21 @@ class Environment {
         outputNames.add(varname);
     }
 
-    public String getVariable(String name) throws Exception {
-        String value = variableValues.get(name);
-        if (value == null) {
-            throw new Exception("Variable not defined" + name);
-        }
-        return value;
+    /**
+     * If no mapping for the key "name" exists, return null
+     */
+    public List<Boolean> getVariable(String name) {
+        return variableValues.get(name);
     }
 
     public String toString() {
         StringBuilder table = new StringBuilder();
         for (String s : outputNames) {
-            table.append(variableValues.get(s) + "\t" + s + "\n");
+            for (Boolean b : variableValues.get(s)) {
+                table.append(b ? "1" : "0");
+            }
+            table.append("\t").append(s).append("\n");
         }
-
         return table.toString();
     }
 }
