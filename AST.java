@@ -58,9 +58,13 @@ class Prog extends AST {
             l.nextCycle(env);
     }
 
+    /**
+     * This method is called by main
+     */
     public void runSimulator(Environment env) {
         initialize(env);
-        // TODO: What if multiple input strings?
+        // Calculates number of cycles
+        // FIXME : If more not all input has same lenght extend to same lenght
         int numOfCycles = 0;
         for (var input : simulate.simIn) {
             int inputSize = input.inputSignal.size();
@@ -212,17 +216,17 @@ class Simulate extends AST {
 }
 
 class SimIn extends AST {
-    public String variable;
+    public String varname;
     public List<Boolean> inputSignal;
 
-    public SimIn(String variable, List<Boolean> inputSignal) {
-        this.variable = variable;
+    public SimIn(String varname, List<Boolean> inputSignal) {
+        this.varname = varname;
         this.inputSignal = inputSignal;
     }
 
     // Store the input bitstring in hashmap
     public void eval(Environment env) {
-        env.setVariable(variable, inputSignal);
+        env.setVariable(varname, inputSignal);
     }
 }
 
