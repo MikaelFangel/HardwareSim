@@ -43,33 +43,15 @@ class Prog extends AST {
         simulate.eval(env);
     }
 
-    public void initialize(Environment env) {
-        // Initialize latches to 0
-        for (var l : latches) {
-            l.initialize(env);
-        }
-    }
-
-    public void nextCycle(Environment env) {
-        // Execute all update statements
-        update.eval(env);
-        // Execute all latches
-        for (var l : latches)
-            l.nextCycle(env);
-    }
-
     /**
      * This method is called by main
      * (Whether inputsize is less than 1 is checked by the hwsim grammar)
      */
     public void runSimulator(Environment env) {
-        initialize(env);
         // Calculates number of cycles
         int numOfCycles = 0;
-        // simulate.simIn.get(0).inputSignal.size()
         for (var input : simulate.simIn) {
             int inputSize = input.inputSignal.size();
-            // 
 
             if (numOfCycles == 0) {
                 numOfCycles = inputSize;
@@ -81,10 +63,40 @@ class Prog extends AST {
                 System.exit(1);
             }
         }
-        
+
+        // Run next cycle until all cycles have been run
         while (cycle < numOfCycles) {
-            nextCycle(env);
+            // Start next cycle by executing all latches
+            for (var l : latches)
+                l.nextCycle(env);
+            
+            // Execute all update statements
+            update.eval(env);
+
             cycle++;
+        }
+
+        // Check for cyclic updates
+        for (var string : env.getTraces()) {
+            Boolean prevBool = null;
+            Boolean isCyclic = true;
+            for (Boolean b : env.getVariable(string)) {
+                // First case
+                if (prevBool == null) {
+                    prevBool = b;
+                    continue;
+                }
+                // If not cyclic
+                if (prevBool == b) {
+                    isCyclic = false;
+                    break;
+                }
+                prevBool = b;
+            }
+            if (isCyclic) {
+                System.out.println("Warning: " + string + " is cyclic.\n");
+                System.out.println();
+            }
         }
     }
 }
@@ -150,7 +162,8 @@ class Latch extends AST {
     // Initialize the output bitstring with 0
     public void initialize(Environment env) {
         List<Boolean> outputBinaries = env.getVariable(output.varname);
-        if (outputBinaries == null) env.setVariable(output.varname, new ArrayList<>());
+        if (outputBinaries == null)
+            env.setVariable(output.varname, new ArrayList<>());
 
         env.getVariable(output.varname).add(false);
     }
@@ -161,17 +174,22 @@ class Latch extends AST {
      * Executes all latches
      */
     public void nextCycle(Environment env) {
-        Boolean currentCycleInput;
+        // In first cycle, latches should initialize to 0
+        if (Prog.cycle == 0) {
+            initialize(env);
+            return;
+        }
+
         // Input to the left of arrow in g4 file
         List<Boolean> inputBinaries = env.getVariable(input.varname);
-        currentCycleInput = inputBinaries == null ? false : inputBinaries.get(Prog.cycle); // check cycle!!
+        Boolean currentCycleInput = inputBinaries == null ? false : inputBinaries.get(Prog.cycle - 1);
 
         // Output to the right of arrow in g4 file
         if (env.getVariable(output.varname) == null)
             env.setVariable(output.varname, new ArrayList<>());
 
-        // getVariable returns the full bitstring. We use charAt to get the current
-        // inputbit, and add to the output bitstring.
+        // Stores the current value of an incomming signal and outputs
+        // it on an outcomming value at each cycle
         env.getVariable(output.varname).add(currentCycleInput);
     }
 }
@@ -298,13 +316,10 @@ class Variable extends Expr {
         this.string = string;
     }
 
-    // Get the current cycle bit from varname
+    /**
+     * Get the current cycle bit from varname
+     */
     public Boolean eval(Environment env) {
-        // If the list hasn't been assigned to this variable
-        // if (this.string.equals(""))
-        //     return null;
-
-        // env.setVariable(varname, this.bList);
         return env.getVariable(this.varname).get(Prog.cycle);
     }
 }
