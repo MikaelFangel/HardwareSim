@@ -1,0 +1,24 @@
+.hardware testExistInEnv
+
+.inputs Button
+.outputs Red Yel Green PRed PGreen
+
+.latch Red -> RedM
+.latch Yel -> YelM
+.latch Req -> ReqM
+
+.update
+
+// As Clr is being accessed before even being added to the 
+// environment, an error message will be printed and program 
+// is exited
+
+Req = (ReqM || Button) && !Clr
+Clr = RedM && !YelM
+Red = !RedM && YelM || RedM && !YelM
+Yel = !RedM && !YelM && Req || RedM && !YelM
+Green  = !Red && !Yel
+PGreen = Red && !Yel
+PRed   = !PGreen
+
+.simulate Button=001001111001
