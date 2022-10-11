@@ -21,7 +21,6 @@ public class main {
 
         // open the input file
         CharStream input = CharStreams.fromFileName(filename);
-        // new ANTLRFileStream (filename); // depricated
 
         // create a lexer/scanner
         hwsimLexer lex = new hwsimLexer(input);
@@ -34,6 +33,10 @@ public class main {
 
         // and parse anything from the grammar for "start"
         ParseTree parseTree = parser.start();
+        if (parser.getNumberOfSyntaxErrors() > 0) {
+            System.err.println("Error: Syntax does not match with hwsim grammer");
+            System.exit(1);
+        }
 
         // Construct an interpreter and run it on the parse tree
         Interpreter interpreter = new Interpreter();

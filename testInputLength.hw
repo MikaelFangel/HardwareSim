@@ -1,0 +1,19 @@
+.hardware testInputLength
+
+// Test for checking that all inputs 
+
+.inputs Button Test
+.outputs Red Yel Green PRed PGreen
+
+.latch Red -> RedM
+.latch Yel -> YelM
+.latch Req -> ReqM
+
+.update
+
+Clr = RedM && !YelM
+Req = (ReqM || Button) && !Clr
+Red = !RedM && YelM || RedM && !YelM
+
+
+.simulate Button=001001111001 Test=10101110
