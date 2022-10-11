@@ -195,37 +195,38 @@ class Latch extends AST {
 }
 
 class Update extends AST {
-    List<UpdateDec> u;
+    List<UpdateDec> updates;
 
-    public Update(List<UpdateDec> u) {
-        this.u = u;
+    public Update(List<UpdateDec> updates) {
+        this.updates = updates;
     }
 
     // eval all update declarations
     public void eval(Environment env) {
-        for (var v : u)
+        for (var v : updates)
             v.eval(env);
     }
 }
 
 class UpdateDec extends AST {
-    String vari;
+    String varname;
     List<Expr> exprList;
 
-    public UpdateDec(String vari, List<Expr> exprList) {
-        this.vari = vari;
+    public UpdateDec(String varname, List<Expr> exprList) {
+        this.varname = varname;
         this.exprList = exprList;
     }
 
     public void eval(Environment env) {
-        // If variable doesn't exist yet, add this to environment with an empty list
-        if (env.getVariable(vari) == null)
-            env.setVariable(vari, new ArrayList<Boolean>());
-
         // Add boolean value to every variable in update for current cycle
         for (var expr : this.exprList) {
             Boolean b = expr.eval(env);
-            env.getVariable(vari).add(b);
+            
+            if(env.getVariable(varname) == null) {
+                System.err.println("Error: " + this.varname + " does not exist in the environment.\n");
+                System.exit(1);
+            }
+            env.getVariable(this.varname).add(b);
         }
     }
 }
