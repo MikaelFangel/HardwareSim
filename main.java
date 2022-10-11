@@ -111,7 +111,8 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     public AST visitSimIn(hwsimParser.SimInContext ctx) {
         List<Boolean> binaries = new ArrayList<>();
         for (var b : ctx.b) {
-            binaries.add(Boolean.parseBoolean(b.getText()));
+            Boolean bool = b.getText().equals("1") ? true : false;
+            binaries.add(bool);
         }
         return new SimIn(ctx.id.getText(), binaries);
     }
