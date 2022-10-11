@@ -29,7 +29,7 @@ M1 = Red || Yel
 // Check for liveness if 4 of the last bits cars had red or yellow
 Liveness = M1 && M2 && M3 && M4
 
-.simulate Button=111111111111
+.simulate Button=001001111001
 /*
 
 Expected output of the simulator:
@@ -40,5 +40,6 @@ Expected output of the simulator:
 110001000110 Green
 111011101111 PRed
 000100010000 PGreen
+000000000000 Liveness
 
 */
