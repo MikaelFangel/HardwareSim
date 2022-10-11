@@ -60,15 +60,26 @@ class Prog extends AST {
 
     /**
      * This method is called by main
+     * (Whether inputsize is less than 1 is checked by the hwsim grammar)
      */
     public void runSimulator(Environment env) {
         initialize(env);
         // Calculates number of cycles
-        // FIXME : If more not all input has same lenght extend to same lenght
         int numOfCycles = 0;
+        // simulate.simIn.get(0).inputSignal.size()
         for (var input : simulate.simIn) {
             int inputSize = input.inputSignal.size();
-            if (inputSize > numOfCycles) numOfCycles = inputSize;
+            // 
+
+            if (numOfCycles == 0) {
+                numOfCycles = inputSize;
+                continue;
+            }
+
+            if (inputSize != numOfCycles) {
+                System.err.print("Error: Length of all inputs should be the same\n");
+                System.exit(1);
+            }
         }
         
         while (cycle < numOfCycles) {
