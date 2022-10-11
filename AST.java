@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AST {};
+public abstract class AST {
+};
 
 class Prog extends AST {
     Hardware hardware;
@@ -36,7 +37,7 @@ class Prog extends AST {
     public void eval(Environment env) {
         hardware.eval(env);
         input.eval(env);
-        for(Latch l : latches)
+        for (Latch l : latches)
             l.eval(env);
         output.eval(env);
         simulate.eval(env);
@@ -44,7 +45,7 @@ class Prog extends AST {
 
     public void initialize(Environment env) {
         // Initialize latches to 0
-        for(var l : latches) {
+        for (var l : latches) {
             l.initialize(env);
         }
     }
@@ -53,15 +54,20 @@ class Prog extends AST {
         // Execute all update statements
         update.eval(env);
         // Execute all latches
-        for(var l : latches)
+        for (var l : latches)
             l.nextCycle(env);
     }
 
     public void runSimulator(Environment env) {
         initialize(env);
-        //TODO: What if multiple input strings?
-        int bitLength = simulate.simIn.get(0).inputSignal.length();
-        while(cycle < bitLength) {
+        // TODO: What if multiple input strings?
+        int numOfCycles = 0;
+        for (var input : simulate.simIn) {
+            int inputSize = input.inputSignal.size();
+            if (inputSize > numOfCycles) numOfCycles = inputSize;
+        }
+        
+        while (cycle < numOfCycles) {
             nextCycle(env);
             cycle++;
         }
@@ -76,7 +82,7 @@ class Hardware extends AST {
     }
 
     public void eval(Environment env) {
-        env.setVariable(vari.varname, "");
+        env.setVariable(vari.varname, new ArrayList<>());
     }
 }
 
@@ -89,8 +95,8 @@ class Input extends AST {
 
     // Initialize input variables in hashmap
     public void eval(Environment env) {
-        for(var v : li) {
-            env.setVariable(v.varname, "");
+        for (var v : li) {
+            env.setVariable(v.varname, new ArrayList<>());
             env.setOutput(v.varname);
         }
     }
@@ -105,8 +111,8 @@ class Output extends AST {
 
     // Initialize output variables in hashmap
     public void eval(Environment env) {
-        for(var v : outputs){
-            env.setVariable(v.varname, "");
+        for (var v : outputs) {
+            env.setVariable(v.varname, new ArrayList<>());
             env.setOutput(v.varname);
         }
     }
@@ -122,42 +128,36 @@ class Latch extends AST {
     }
 
     public void eval(Environment env) {
-        env.setVariable(input.varname, "");
-        env.setVariable(output.varname, "");
-    }
-    
-    // Initialize the output bitstring with 0
-    public void initialize(Environment env) {
-        String outputBinaries;
-        try {
-             outputBinaries = env.getVariable(output.varname);
-        } catch(Exception e) {
-            outputBinaries = "";
-            env.setVariable(output.varname, outputBinaries);
-        }
-        outputBinaries += '0';
-        env.setVariable(output.varname, outputBinaries);
+        env.setVariable(input.varname, new ArrayList<>());
+        env.setVariable(output.varname, new ArrayList<>());
     }
 
-    // Set the output value to the current value of the input 
+    // Initialize the output bitstring with 0
+    public void initialize(Environment env) {
+        List<Boolean> outputBinaries = env.getVariable(output.varname);
+        if (outputBinaries == null) env.setVariable(output.varname, new ArrayList<>());
+
+        env.getVariable(output.varname).add(false);
+    }
+
+    // Set the output value to the current value of the input
+
+    /**
+     * Executes all latches
+     */
     public void nextCycle(Environment env) {
-        String inputBitString;
-        String outputBitString;
-        try {
-             inputBitString = env.getVariable(input.varname);
-        } catch(Exception e) {
-            inputBitString = "";
-            env.setVariable(output.varname, inputBitString);
-        }
-        try {
-             outputBitString = env.getVariable(output.varname);
-        } catch(Exception e) {
-            outputBitString = "";
-            env.setVariable(output.varname, outputBitString);
-        }
-        // getVariable returns the full bitstring. We use charAt to get the current inputbit, and add to the output bitstring.
-        outputBitString += inputBitString.charAt(inputBitString.length()-1);
-        env.setVariable(output.varname, outputBitString);
+        Boolean currentCycleInput;
+        // Input to the left of arrow in g4 file
+        List<Boolean> inputBinaries = env.getVariable(input.varname);
+        currentCycleInput = inputBinaries == null ? false : inputBinaries.get(Prog.cycle); // check cycle!!
+
+        // Output to the right of arrow in g4 file
+        if (env.getVariable(output.varname) == null)
+            env.setVariable(output.varname, new ArrayList<>());
+
+        // getVariable returns the full bitstring. We use charAt to get the current
+        // inputbit, and add to the output bitstring.
+        env.getVariable(output.varname).add(currentCycleInput);
     }
 }
 
@@ -167,10 +167,10 @@ class Update extends AST {
     public Update(List<UpdateDec> u) {
         this.u = u;
     }
-    
+
     // eval all update declarations
     public void eval(Environment env) {
-        for(var v : u)
+        for (var v : u)
             v.eval(env);
     }
 }
@@ -184,20 +184,16 @@ class UpdateDec extends AST {
         this.exprList = exprList;
     }
 
-
-    // eval expr and add the result to the bitstring. Store in hashmap
     public void eval(Environment env) {
-    String binaries;
-        try {
-             binaries = env.getVariable(vari);
-        } catch(Exception e) {
-            binaries = "";
-            env.setVariable(vari, binaries);
+        // If variable doesn't exist yet, add this to environment with an empty list
+        if (env.getVariable(vari) == null)
+            env.setVariable(vari, new ArrayList<Boolean>());
+
+        // Add boolean value to every variable in update for current cycle
+        for (var expr : this.exprList) {
+            Boolean b = expr.eval(env);
+            env.getVariable(vari).add(b);
         }
-        for(var expr : exprList) {
-            binaries += expr.eval(env);
-        }
-        env.setVariable(vari, binaries);
     }
 }
 
@@ -209,7 +205,7 @@ class Simulate extends AST {
     }
 
     public void eval(Environment env) {
-        for(SimIn in : simIn) {
+        for (SimIn in : simIn) {
             in.eval(env);
         }
     }
@@ -217,9 +213,9 @@ class Simulate extends AST {
 
 class SimIn extends AST {
     public String variable;
-    public String inputSignal;
+    public List<Boolean> inputSignal;
 
-    public SimIn(String variable, String inputSignal) {
+    public SimIn(String variable, List<Boolean> inputSignal) {
         this.variable = variable;
         this.inputSignal = inputSignal;
     }
@@ -231,7 +227,7 @@ class SimIn extends AST {
 }
 
 abstract class Expr extends AST {
-    abstract public String eval(Environment env);
+    abstract public Boolean eval(Environment env);
 }
 
 class Negation extends Expr {
@@ -241,10 +237,8 @@ class Negation extends Expr {
         this.c1 = c1;
     }
 
-    public String eval(Environment env) {
-        if(c1.eval(env).equals("0"))
-            return "1";
-        return "0";
+    public Boolean eval(Environment env) {
+        return !c1.eval(env);
     }
 }
 
@@ -256,10 +250,8 @@ class Conjunction extends Expr {
         this.c2 = c2;
     }
 
-    public String eval(Environment env) {
-        if(c1.eval(env).equals("1") && c2.eval(env).equals("1"))
-            return "1";
-        return "0";
+    public Boolean eval(Environment env) {
+        return c1.eval(env) && c2.eval(env);
     }
 }
 
@@ -271,30 +263,33 @@ class Disjunction extends Expr {
         this.c2 = c2;
     }
 
-    public String eval(Environment env) {
-        if(c1.eval(env).equals("0") && c2.eval(env).equals("0"))
-            return "0";
-        return "1";
+    public Boolean eval(Environment env) {
+        return c1.eval(env) || c2.eval(env);
     }
 }
 
 class Variable extends Expr {
     String varname;
+    String string = "";
+    List<Boolean> bList;
 
-    public Variable(String varname) {
+    public Variable(String varname, List<Boolean> bList) {
         this.varname = varname;
+        this.bList = bList;
+    }
+
+    public Variable(String varname, String string) {
+        this.varname = varname;
+        this.string = string;
     }
 
     // Get the current cycle bit from varname
-    public String eval(Environment env) {
-        String bitString;
-        try {
-            bitString = env.getVariable(varname);
-        } catch(Exception e) {
-            bitString = "";
-            env.setVariable(varname, bitString);
-        }
-        String bit = bitString.charAt(Prog.cycle) + "";
-        return bit;
+    public Boolean eval(Environment env) {
+        // If the list hasn't been assigned to this variable
+        // if (this.string.equals(""))
+        //     return null;
+
+        // env.setVariable(varname, this.bList);
+        return env.getVariable(this.varname).get(Prog.cycle);
     }
 }
