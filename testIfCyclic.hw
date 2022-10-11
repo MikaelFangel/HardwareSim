@@ -1,0 +1,23 @@
+.hardware testIfCyclic
+
+// When a variable is cyclic, a warning is printed, 
+// but program otherwise resumes.
+
+.inputs Button
+.outputs Red Yel Green PRed PGreen
+
+.latch Red -> RedM
+.latch Yel -> YelM
+.latch Req -> ReqM
+
+.update
+
+Clr = RedM && !YelM
+Req = (ReqM || Button) && !Clr
+Red = !RedM && YelM || RedM && !YelM
+Yel = !RedM && !YelM && Req || RedM && !YelM
+Green  = !Red && !Yel
+PGreen = Red && !Yel
+PRed   = !PGreen
+
+.simulate Button=10101010101

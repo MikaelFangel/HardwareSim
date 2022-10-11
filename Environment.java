@@ -16,6 +16,20 @@ class Environment {
     }
 
     /**
+     * Only call this method after all cycles are done
+     * @return traces needed to test for e.g. 
+     */
+    public List<String> getTraces() {
+        List<String> keys = new ArrayList<>();
+        for (String string : variableValues.keySet()) {
+            if (variableValues.get(string).size() > 0) {
+                keys.add(string);
+            }
+        }
+        return keys;
+    }
+
+    /**
      * If no mapping for the key "name" exists, return null
      */
     public List<Boolean> getVariable(String name) {

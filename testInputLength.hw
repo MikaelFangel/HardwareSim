@@ -1,6 +1,8 @@
 .hardware testInputLength
 
-// Test for checking that all inputs 
+// Test for checking that all inputs are the same length.
+// When the length of inputs are different from each other, 
+// print error message and terminate program.
 
 .inputs Button Test
 .outputs Red Yel Green PRed PGreen
