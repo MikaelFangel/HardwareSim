@@ -61,27 +61,27 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitProg(hwsimParser.ProgContext ctx) {
-    List<Latch> latches= new ArrayList<>();
+        List<Latch> latches = new ArrayList<>();
         for (hwsimParser.LatchContext la : ctx.l) {
             latches.add((Latch) visit(la));
         }
 
-        return new Prog((Hardware) visit(ctx.h), 
-        (Input) visit(ctx.i), 
-        (Output) visit(ctx.o), 
-        latches, 
-        (Update) visit(ctx.u), 
-        (Simulate) visit(ctx.s));
+        return new Prog((Hardware) visit(ctx.h),
+                (Input) visit(ctx.i),
+                (Output) visit(ctx.o),
+                latches,
+                (Update) visit(ctx.u),
+                (Simulate) visit(ctx.s));
     }
 
-   public AST visitHardware(hwsimParser.HardwareContext ctx) {
+    public AST visitHardware(hwsimParser.HardwareContext ctx) {
         return new Hardware(new Variable(ctx.id.getText(), ".hardware"));
     }
 
     public AST visitInput(hwsimParser.InputContext ctx) {
         List<Variable> ins = new ArrayList<>();
         List<Boolean> b = new ArrayList<>();
-        for(var v : ctx.id)
+        for (var v : ctx.id)
             ins.add(new Variable(v.getText(), ".input"));
 
         return new Input(ins);
@@ -89,7 +89,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
 
     public AST visitOutput(hwsimParser.OutputContext ctx) {
         List<Variable> outs = new ArrayList<>();
-        for(var v : ctx.id)
+        for (var v : ctx.id)
             outs.add(new Variable(v.getText(), ".output"));
         return new Output(outs);
     }
@@ -100,7 +100,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
 
     public AST visitUpdate(hwsimParser.UpdateContext ctx) {
         List<UpdateDec> updateDecList = new ArrayList<>();
-        for(var updateDec : ctx.u) {
+        for (var updateDec : ctx.u) {
             updateDecList.add((UpdateDec) visit(updateDec));
         }
         return new Update(updateDecList);
@@ -112,7 +112,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
             simIn.add((SimIn) visit(SimInContext));
         return new Simulate(simIn);
     }
-    
+
     public AST visitSimIn(hwsimParser.SimInContext ctx) {
         List<Boolean> binaries = new ArrayList<>();
         for (var b : ctx.b) {
@@ -124,7 +124,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
 
     public AST visitUpdateDec(hwsimParser.UpdateDecContext ctx) {
         List<Expr> exprList = new ArrayList<>();
-        for(var expr : ctx.e)
+        for (var expr : ctx.e)
             exprList.add((Expr) visit(expr));
         return new UpdateDec(ctx.id.getText(), exprList);
     }
