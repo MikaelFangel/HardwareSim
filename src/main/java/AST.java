@@ -218,7 +218,7 @@ class UpdateDec extends AST {
         for (var expr : this.exprList) {
             Boolean b = expr.eval(env);
 
-            if(env.getVariable(varName) == null)
+            if (env.getVariable(varName) == null)
                 env.setVariable(varName, new ArrayList<>());
 
             env.getVariable(this.varName).add(b);
