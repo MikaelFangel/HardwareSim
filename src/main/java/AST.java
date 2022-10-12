@@ -63,8 +63,8 @@ class Prog extends AST {
         // Run next cycle until all cycles have been run
         while (cycle < numOfCycles) {
             // Start next cycle by executing all latches
-            for (var l : latches)
-                l.nextCycle(env);
+            for (var latch : latches)
+                latch.nextCycle(env);
 
             // Execute all update statements
             update.eval(env);
@@ -73,24 +73,24 @@ class Prog extends AST {
         }
 
         // Check for cyclic updates
-        for (var string : env.getTraces()) {
+        for (var stringOfBinaries : env.getTraces()) {
             Boolean prevBool = null;
             boolean isCyclic = true;
-            for (Boolean b : env.getVariable(string)) {
+            for (Boolean binary : env.getVariable(stringOfBinaries)) {
                 // First case
                 if (prevBool == null) {
-                    prevBool = b;
+                    prevBool = binary;
                     continue;
                 }
                 // If not cyclic
-                if (prevBool == b) {
+                if (prevBool == binary) {
                     isCyclic = false;
                     break;
                 }
-                prevBool = b;
+                prevBool = binary;
             }
             if (isCyclic) {
-                System.out.println("Warning: " + string + " is cyclic.\n");
+                System.out.println("Warning: " + stringOfBinaries + " is cyclic.\n");
                 System.out.println();
             }
         }
@@ -118,7 +118,7 @@ class Input extends AST {
 
     // Initialize input variables in hashmap
     public void eval(Environment env) {
-        for (var variable : variableList) {
+        for (Variable variable : variableList) {
             env.setVariable(variable.varName, new ArrayList<>());
             env.setOutput(variable.varName);
         }
@@ -134,9 +134,9 @@ class Output extends AST {
 
     // Initialize output variables in hashmap
     public void eval(Environment env) {
-        for (var v : outputs) {
-            env.setVariable(v.varName, new ArrayList<>());
-            env.setOutput(v.varName);
+        for (Variable output : outputs) {
+            env.setVariable(output.varName, new ArrayList<>());
+            env.setOutput(output.varName);
         }
     }
 }
@@ -215,7 +215,7 @@ class UpdateDec extends AST {
 
     public void eval(Environment env) {
         // Add boolean value to every variable in update for current cycle
-        for (var expr : this.exprList) {
+        for (Expr expr : this.exprList) {
             Boolean b = expr.eval(env);
 
             if (env.getVariable(varName) == null)
