@@ -4,7 +4,7 @@
     <module name="HardwareSim" />
     <option name="PROGRAM_PARAMETERS" value="src/main/java/input.txt" />
     <method v="2">
-      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_Make Java FIles" />
+      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_Make Java Files" />
       <option name="Make" enabled="true" />
     </method>
   </configuration>
