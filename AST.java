@@ -69,7 +69,7 @@ class Prog extends AST {
             // Start next cycle by executing all latches
             for (var l : latches)
                 l.nextCycle(env);
-            
+
             // Execute all update statements
             update.eval(env);
 
@@ -221,10 +221,9 @@ class UpdateDec extends AST {
         // Add boolean value to every variable in update for current cycle
         for (var expr : this.exprList) {
             Boolean b = expr.eval(env);
-            
+
             if(env.getVariable(varname) == null) {
-                System.err.println("Error: " + this.varname + " does not exist in the environment.\n");
-                System.exit(1);
+                env.setVariable(varname, new ArrayList<>());
             }
             env.getVariable(this.varname).add(b);
         }
