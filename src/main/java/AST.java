@@ -1,12 +1,12 @@
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 import org.antlr.v4.runtime.CharStreams;
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AST {
-};
+}
 
 class Prog extends AST {
     Hardware hardware;
@@ -37,15 +37,15 @@ class Prog extends AST {
     public void eval(Environment env) {
         hardware.eval(env);
         input.eval(env);
-        for (Latch l : latches)
-            l.eval(env);
+        for (Latch latch : latches)
+            latch.eval(env);
         output.eval(env);
         simulate.eval(env);
     }
 
     /**
      * This method is called by main
-     * (Whether inputsize is less than 1 is checked by the hwsim grammar)
+     * (Whether input size is less than 1 is checked by the hwsim grammar)
      */
     public void runSimulator(Environment env) {
         // Calculates number of cycles
@@ -79,7 +79,7 @@ class Prog extends AST {
         // Check for cyclic updates
         for (var string : env.getTraces()) {
             Boolean prevBool = null;
-            Boolean isCyclic = true;
+            boolean isCyclic = true;
             for (Boolean b : env.getVariable(string)) {
                 // First case
                 if (prevBool == null) {
@@ -102,29 +102,29 @@ class Prog extends AST {
 }
 
 class Hardware extends AST {
-    Variable vari;
+    Variable variable;
 
-    public Hardware(Variable vari) {
-        this.vari = vari;
+    public Hardware(Variable variable) {
+        this.variable = variable;
     }
 
     public void eval(Environment env) {
-        env.setVariable(vari.varname, new ArrayList<>());
+        env.setVariable(variable.varName, new ArrayList<>());
     }
 }
 
 class Input extends AST {
-    List<Variable> li;
+    List<Variable> variableList;
 
-    Input(List<Variable> li) {
-        this.li = li;
+    Input(List<Variable> variableList) {
+        this.variableList = variableList;
     }
 
     // Initialize input variables in hashmap
     public void eval(Environment env) {
-        for (var v : li) {
-            env.setVariable(v.varname, new ArrayList<>());
-            env.setOutput(v.varname);
+        for (var variable : variableList) {
+            env.setVariable(variable.varName, new ArrayList<>());
+            env.setOutput(variable.varName);
         }
     }
 }
@@ -139,8 +139,8 @@ class Output extends AST {
     // Initialize output variables in hashmap
     public void eval(Environment env) {
         for (var v : outputs) {
-            env.setVariable(v.varname, new ArrayList<>());
-            env.setOutput(v.varname);
+            env.setVariable(v.varName, new ArrayList<>());
+            env.setOutput(v.varName);
         }
     }
 }
@@ -155,17 +155,17 @@ class Latch extends AST {
     }
 
     public void eval(Environment env) {
-        env.setVariable(input.varname, new ArrayList<>());
-        env.setVariable(output.varname, new ArrayList<>());
+        env.setVariable(input.varName, new ArrayList<>());
+        env.setVariable(output.varName, new ArrayList<>());
     }
 
     // Initialize the output bitstring with 0
     public void initialize(Environment env) {
-        List<Boolean> outputBinaries = env.getVariable(output.varname);
+        List<Boolean> outputBinaries = env.getVariable(output.varName);
         if (outputBinaries == null)
-            env.setVariable(output.varname, new ArrayList<>());
+            env.setVariable(output.varName, new ArrayList<>());
 
-        env.getVariable(output.varname).add(false);
+        env.getVariable(output.varName).add(false);
     }
 
     // Set the output value to the current value of the input
@@ -181,39 +181,39 @@ class Latch extends AST {
         }
 
         // Input to the left of arrow in g4 file
-        List<Boolean> inputBinaries = env.getVariable(input.varname);
-        Boolean currentCycleInput = inputBinaries == null ? false : inputBinaries.get(Prog.cycle - 1);
+        List<Boolean> inputBinaries = env.getVariable(input.varName);
+        Boolean currentCycleInput = inputBinaries != null && inputBinaries.get(Prog.cycle - 1);
 
         // Output to the right of arrow in g4 file
-        if (env.getVariable(output.varname) == null)
-            env.setVariable(output.varname, new ArrayList<>());
+        if (env.getVariable(output.varName) == null)
+            env.setVariable(output.varName, new ArrayList<>());
 
-        // Stores the current value of an incomming signal and outputs
-        // it on an outcomming value at each cycle
-        env.getVariable(output.varname).add(currentCycleInput);
+        // Stores the current value of an incoming signal and outputs
+        // it on an out-coming value at each cycle
+        env.getVariable(output.varName).add(currentCycleInput);
     }
 }
 
 class Update extends AST {
-    List<UpdateDec> updates;
+    List<UpdateDec> updateDecList;
 
-    public Update(List<UpdateDec> updates) {
-        this.updates = updates;
+    public Update(List<UpdateDec> updateDecList) {
+        this.updateDecList = updateDecList;
     }
 
     // eval all update declarations
     public void eval(Environment env) {
-        for (var v : updates)
-            v.eval(env);
+        for (var updateDec : updateDecList)
+            updateDec.eval(env);
     }
 }
 
 class UpdateDec extends AST {
-    String varname;
+    String varName;
     List<Expr> exprList;
 
-    public UpdateDec(String varname, List<Expr> exprList) {
-        this.varname = varname;
+    public UpdateDec(String varName, List<Expr> exprList) {
+        this.varName = varName;
         this.exprList = exprList;
     }
 
@@ -222,10 +222,10 @@ class UpdateDec extends AST {
         for (var expr : this.exprList) {
             Boolean b = expr.eval(env);
 
-            if(env.getVariable(varname) == null) {
-                env.setVariable(varname, new ArrayList<>());
-            }
-            env.getVariable(this.varname).add(b);
+            if(env.getVariable(varName) == null)
+                env.setVariable(varName, new ArrayList<>());
+
+            env.getVariable(this.varName).add(b);
         }
     }
 }
@@ -238,24 +238,23 @@ class Simulate extends AST {
     }
 
     public void eval(Environment env) {
-        for (SimIn in : simIn) {
+        for (SimIn in : simIn)
             in.eval(env);
-        }
     }
 }
 
 class SimIn extends AST {
-    public String varname;
+    public String varName;
     public List<Boolean> inputSignal;
 
-    public SimIn(String varname, List<Boolean> inputSignal) {
-        this.varname = varname;
+    public SimIn(String varName, List<Boolean> inputSignal) {
+        this.varName = varName;
         this.inputSignal = inputSignal;
     }
 
-    // Store the input bitstring in hashmap
+    // Store the input bit-string in hashmap
     public void eval(Environment env) {
-        env.setVariable(varname, inputSignal);
+        env.setVariable(varName, inputSignal);
     }
 }
 
@@ -302,24 +301,24 @@ class Disjunction extends Expr {
 }
 
 class Variable extends Expr {
-    String varname;
+    String varName;
     String string = "";
     List<Boolean> bList;
 
-    public Variable(String varname, List<Boolean> bList) {
-        this.varname = varname;
+    public Variable(String varName, List<Boolean> bList) {
+        this.varName = varName;
         this.bList = bList;
     }
 
-    public Variable(String varname, String string) {
-        this.varname = varname;
+    public Variable(String varName, String string) {
+        this.varName = varName;
         this.string = string;
     }
 
     /**
-     * Get the current cycle bit from varname
+     * Get the current cycle bit from varName
      */
     public Boolean eval(Environment env) {
-        return env.getVariable(this.varname).get(Prog.cycle);
+        return env.getVariable(this.varName).get(Prog.cycle);
     }
 }
