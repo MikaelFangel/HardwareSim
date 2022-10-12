@@ -1,7 +1,9 @@
-import org.antlr.v4.runtime.tree.ParseTreeVisitor;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
+import org.antlr.v4.runtime.tree.ParseTree;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +46,7 @@ public class main {
         Environment env = new Environment();
         result.eval(env);
         result.runSimulator(env);
-        System.out.println(env.toString());
+        System.out.println(env);
     }
 }
 
@@ -59,7 +61,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitProg(hwsimParser.ProgContext ctx) {
-    List<Latch> latches=new ArrayList<Latch>();
+    List<Latch> latches= new ArrayList<>();
         for (hwsimParser.LatchContext la : ctx.l) {
             latches.add((Latch) visit(la));
         }
@@ -114,7 +116,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     public AST visitSimIn(hwsimParser.SimInContext ctx) {
         List<Boolean> binaries = new ArrayList<>();
         for (var b : ctx.b) {
-            Boolean bool = b.getText().equals("1") ? true : false;
+            Boolean bool = b.getText().equals("1");
             binaries.add(bool);
         }
         return new SimIn(ctx.id.getText(), binaries);

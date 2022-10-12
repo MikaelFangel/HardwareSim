@@ -1,7 +1,3 @@
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
-import org.antlr.v4.runtime.CharStreams;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +11,7 @@ class Prog extends AST {
     List<Latch> latches;
     Update update;
     Simulate simulate;
-    // Glocal variable for keeping track of the current cycle
+    // Global variable for keeping track of the current cycle
     public static int cycle = 0;
 
     public Prog(

@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Environment {
-    private HashMap<String, List<Boolean>> variableValues = new HashMap<>();
-    private List<String> outputNames = new ArrayList<>();
+    private final HashMap<String, List<Boolean>> variableValues = new HashMap<>();
+    private final List<String> outputNames = new ArrayList<>();
 
     public void setVariable(String name, List<Boolean> value) {
         variableValues.put(name, value);
     }
 
-    public void setOutput(String varname) {
-        outputNames.add(varname);
+    public void setOutput(String varName) {
+        outputNames.add(varName);
     }
 
     /**
