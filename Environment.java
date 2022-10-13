@@ -30,10 +30,10 @@ class Environment {
     }
 
     /**
-     * If no mapping for the key "name" exists, return null
+     * If no mapping for the key exists, return null
      */
-    public List<Boolean> getVariable(String name) {
-        return variableValues.get(name);
+    public List<Boolean> getVariable(String key) {
+        return variableValues.get(key);
     }
 
     public String toString() {
