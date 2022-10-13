@@ -69,7 +69,7 @@ class Prog extends AST {
             // Start next cycle by executing all latches
             for (var l : latches)
                 l.nextCycle(env);
-            
+
             // Execute all update statements
             update.eval(env);
 
@@ -146,8 +146,8 @@ class Output extends AST {
 }
 
 class Latch extends AST {
-    Variable input;
-    Variable output;
+    Variable input; // Left side of arrow
+    Variable output; // right side of arrow
 
     public Latch(Variable input, Variable output) {
         this.input = input;
@@ -155,23 +155,17 @@ class Latch extends AST {
     }
 
     public void eval(Environment env) {
-        env.setVariable(input.varname, new ArrayList<>());
-        env.setVariable(output.varname, new ArrayList<>());
+        env.setVariable(this.input.varname, new ArrayList<>());
+        env.setVariable(this.output.varname, new ArrayList<>());
     }
 
     // Initialize the output bitstring with 0
     public void initialize(Environment env) {
-        List<Boolean> outputBinaries = env.getVariable(output.varname);
-        if (outputBinaries == null)
-            env.setVariable(output.varname, new ArrayList<>());
-
         env.getVariable(output.varname).add(false);
     }
 
-    // Set the output value to the current value of the input
-
     /**
-     * Executes all latches
+     * Executes all latches. Set the output value to the current value of the input
      */
     public void nextCycle(Environment env) {
         // In first cycle, latches should initialize to 0
@@ -182,11 +176,7 @@ class Latch extends AST {
 
         // Input to the left of arrow in g4 file
         List<Boolean> inputBinaries = env.getVariable(input.varname);
-        Boolean currentCycleInput = inputBinaries == null ? false : inputBinaries.get(Prog.cycle - 1);
-
-        // Output to the right of arrow in g4 file
-        if (env.getVariable(output.varname) == null)
-            env.setVariable(output.varname, new ArrayList<>());
+        Boolean currentCycleInput = inputBinaries.get(Prog.cycle - 1);
 
         // Stores the current value of an incomming signal and outputs
         // it on an outcomming value at each cycle
@@ -218,14 +208,11 @@ class UpdateDec extends AST {
     }
 
     public void eval(Environment env) {
+        if (env.getVariable(this.varname) == null)
+            env.setVariable(this.varname, new ArrayList<>());
         // Add boolean value to every variable in update for current cycle
         for (var expr : this.exprList) {
             Boolean b = expr.eval(env);
-            
-            if(env.getVariable(varname) == null) {
-                System.err.println("Error: " + this.varname + " does not exist in the environment.\n");
-                System.exit(1);
-            }
             env.getVariable(this.varname).add(b);
         }
     }
@@ -272,7 +259,7 @@ class Negation extends Expr {
     }
 
     public Boolean eval(Environment env) {
-        return !c1.eval(env);
+        return !this.c1.eval(env);
     }
 }
 
@@ -285,7 +272,10 @@ class Conjunction extends Expr {
     }
 
     public Boolean eval(Environment env) {
-        return c1.eval(env) && c2.eval(env);
+        // We evaluate before return, so right side are evaluated even if left = 0 (always false)
+        Boolean left = this.c1.eval(env);
+        Boolean right = this.c2.eval(env);
+        return left && right;
     }
 }
 
@@ -298,7 +288,10 @@ class Disjunction extends Expr {
     }
 
     public Boolean eval(Environment env) {
-        return c1.eval(env) || c2.eval(env);
+        // We evaluate before return, so right side are evaluated even if left = 1 (always true)
+        Boolean left = this.c1.eval(env);
+        Boolean right = this.c2.eval(env);
+        return left || right;
     }
 }
 
@@ -321,6 +314,11 @@ class Variable extends Expr {
      * Get the current cycle bit from varname
      */
     public Boolean eval(Environment env) {
+        if (env.getVariable(this.varname) == null) {
+            System.out.println("Error: " + this.varname + " does not exist in the environment yet. You cannot evaluate on a variable that has not been declared yet.");
+            System.exit(1);
+        }
+
         return env.getVariable(this.varname).get(Prog.cycle);
     }
 }
