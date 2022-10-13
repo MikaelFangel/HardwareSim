@@ -1,0 +1,16 @@
+.hardware testIfDeclared
+
+.inputs Button
+.outputs Red Yel
+
+.latch Red -> RedM
+.latch Yel -> YelM
+.latch Req -> ReqM
+
+.update
+
+Req = (ReqM || Button) && !Clr
+Clr = RedM && !YelM
+
+
+.simulate Button=001001111001
