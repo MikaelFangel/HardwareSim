@@ -138,9 +138,16 @@ class Output extends AST {
 
     // Initialize output variables in hashmap
     public void eval(Environment env) {
+        List<String> prevName = new ArrayList<>();
         for (var v : outputs) {
-            env.setVariable(v.varname, new ArrayList<>());
-            env.setOutput(v.varname);
+            if (prevName.contains(v.varname))
+                System.out.println("Warning: " + v.varname + " is written more than once in output.");
+            else {
+                prevName.add(v.varname);
+                env.setVariable(v.varname, new ArrayList<>());
+                env.setOutput(v.varname);
+
+            }
         }
     }
 }
@@ -277,7 +284,8 @@ class Conjunction extends Expr {
     }
 
     public Boolean eval(Environment env) {
-        // We evaluate before return, so right side are evaluated even if left = 0 (always false)
+        // We evaluate before return, so right side are evaluated even if left = 0
+        // (always false)
         Boolean left = this.c1.eval(env);
         Boolean right = this.c2.eval(env);
         return left && right;
@@ -293,7 +301,8 @@ class Disjunction extends Expr {
     }
 
     public Boolean eval(Environment env) {
-        // We evaluate before return, so right side are evaluated even if left = 1 (always true)
+        // We evaluate before return, so right side are evaluated even if left = 1
+        // (always true)
         Boolean left = this.c1.eval(env);
         Boolean right = this.c2.eval(env);
         return left || right;
@@ -320,7 +329,8 @@ class Variable extends Expr {
      */
     public Boolean eval(Environment env) {
         if (env.getVariable(this.varname) == null) {
-            System.err.println("Error: " + this.varname + " does not exist in the environment yet. You cannot evaluate on a variable that has not been declared yet.");
+            System.err.println("Error: " + this.varname
+                    + " does not exist in the environment yet. You cannot evaluate on a variable that has not been declared yet.");
             System.exit(1);
         }
 
