@@ -37,10 +37,10 @@ class Prog extends AST {
     public void eval(Environment env) {
         hardware.eval(env);
         input.eval(env);
+        simulate.eval(env);
         for (Latch l : latches)
             l.eval(env);
         output.eval(env);
-        simulate.eval(env);
     }
 
     /**
@@ -243,6 +243,11 @@ class SimIn extends AST {
 
     // Store the input bitstring in hashmap
     public void eval(Environment env) {
+        // Error if does declared in input
+        if (env.getVariable(varname) == null) {
+            System.err.println("Error: " + this.varname + " is not an input.");
+            System.exit(1);
+        }
         env.setVariable(varname, inputSignal);
     }
 }
@@ -315,7 +320,7 @@ class Variable extends Expr {
      */
     public Boolean eval(Environment env) {
         if (env.getVariable(this.varname) == null) {
-            System.out.println("Error: " + this.varname + " does not exist in the environment yet. You cannot evaluate on a variable that has not been declared yet.");
+            System.err.println("Error: " + this.varname + " does not exist in the environment yet. You cannot evaluate on a variable that has not been declared yet.");
             System.exit(1);
         }
 
