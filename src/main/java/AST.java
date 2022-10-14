@@ -43,7 +43,7 @@ class Prog extends AST {
      * This method is called by main
      * (Whether input size is less than 1 is checked by the hwsim grammar)
      */
-    public void runSimulator(Environment env) throws Exception {
+    public void runSimulator(Environment env) throws ConditionException, UpdateException {
         // Calculates number of cycles
         int numOfCycles = 0;
         for (var input : simulate.simIn) {
@@ -194,7 +194,7 @@ class Update extends AST {
     }
 
     // eval all update declarations
-    public void eval(Environment env) throws Exception {
+    public void eval(Environment env) throws ConditionException, UpdateException {
         for (var updateDec : updateDecList)
             updateDec.eval(env);
     }
@@ -209,7 +209,7 @@ class UpdateDec extends AST {
         this.exprList = exprList;
     }
 
-    public void eval(Environment env) throws Exception {
+    public void eval(Environment env) throws UpdateException, ConditionException {
         if (env.getVariable(this.varName) == null)
             env.setVariable(this.varName, new Variable(this.varName, new ArrayList<>()));
         // Add boolean value to every variable in update for current cycle
@@ -218,7 +218,7 @@ class UpdateDec extends AST {
             if(b.type == Type.BIN)
                 env.getVariable(this.varName).valueList.add(new Value(b.bool));
             else
-                throw new Exception("Error: Can't run update on string values");
+                throw new UpdateException("Error: Can't run update on string values");
         }
     }
 }
@@ -258,7 +258,7 @@ class SimIn extends AST {
 }
 
 abstract class Expr extends AST {
-    abstract public Value eval(Environment env) throws Exception;
+    abstract public Value eval(Environment env) throws ConditionException;
 }
 
 class Negation extends Expr {
@@ -268,12 +268,13 @@ class Negation extends Expr {
         this.c1 = c1;
     }
 
-    public Value eval(Environment env) throws Exception {
+    public Value eval(Environment env) throws ConditionException {
         Value value = this.c1.eval(env);
         if (value.type == Type.BIN)
             return new Value(!this.c1.eval(env).bool);
         else
-            throw new ComparativeException("Error: can't negate other than binary numbers");
+            throw new ConditionException("Error: can't negate other than binary numbers\n" +
+                    "The value: " + value + "was given");
     }
 }
 
@@ -285,7 +286,7 @@ class Conjunction extends Expr {
         this.c2 = c2;
     }
 
-    public Value eval(Environment env) throws Exception {
+    public Value eval(Environment env) throws ConditionException {
         // We evaluate before return, so right side are evaluated even if left = 0
         // (always false)
         Value left = this.c1.eval(env);
@@ -294,7 +295,8 @@ class Conjunction extends Expr {
         if (left.type == Type.BIN && right.type == Type.BIN)
             return new Value(left.bool && right.bool);
         else
-            throw new ComparativeException("Error: can't compare other than binary numbers");
+            throw new ConditionException("Error: can't compare other than binary numbers\n" +
+                    "Tried to compare " + left + " with " + right);
     }
 }
 
@@ -306,7 +308,7 @@ class Disjunction extends Expr {
         this.c2 = c2;
     }
 
-    public Value eval(Environment env) throws Exception {
+    public Value eval(Environment env) throws ConditionException {
         // We evaluate before return, so right side are evaluated even if left = 1
         // (always true)
         Value left = this.c1.eval(env);
@@ -315,7 +317,8 @@ class Disjunction extends Expr {
         if (left.type == Type.BIN && right.type == Type.BIN)
             return new Value(left.bool || right.bool);
         else
-            throw new ComparativeException("Error: can't compare other than binary numbers");
+            throw new ConditionException("Error: can't compare other than binary numbers\n" +
+                    "Tried to compare: " + left + " with " + right);
     }
 }
 
@@ -340,7 +343,8 @@ class Variable extends Expr {
     public Value eval(Environment env) {
         if (env.getVariable(this.varName) == null) {
             System.err.println("Error: " + this.varName
-                    + " does not exist in the environment yet. You cannot evaluate on a variable that has not been declared yet.");
+                    + " does not exist in the environment yet. " +
+                    "You cannot evaluate on a variable that has not been declared yet.");
             System.exit(1);
         }
 
@@ -383,9 +387,14 @@ class Value {
     }
 }
 
-class ComparativeException extends Exception {
-    public ComparativeException(String errMsg) {
+class ConditionException extends Exception {
+    public ConditionException(String errMsg) {
         super(errMsg);
     }
+}
 
+class UpdateException extends Exception {
+    public UpdateException(String errMsg) {
+        super(errMsg);
+    }
 }
