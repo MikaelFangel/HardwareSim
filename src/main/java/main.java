@@ -75,13 +75,13 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     }
 
     public AST visitHardware(hwsimParser.HardwareContext ctx) {
-        return new Hardware(new Variable(ctx.id.getText(), ".hardware"));
+        return new Hardware(new Variable(".hardware", ctx.id.getText()));
     }
 
     public AST visitInput(hwsimParser.InputContext ctx) {
         List<Variable> ins = new ArrayList<>();
         for (var input : ctx.id)
-            ins.add(new Variable(input.getText(), ".input"));
+            ins.add(new Variable(input.getText(), new ArrayList<>()));
 
         return new Input(ins);
     }
@@ -89,7 +89,7 @@ class Interpreter extends AbstractParseTreeVisitor<AST> implements hwsimVisitor<
     public AST visitOutput(hwsimParser.OutputContext ctx) {
         List<Variable> outs = new ArrayList<>();
         for (var output : ctx.id)
-            outs.add(new Variable(output.getText(), ".output"));
+            outs.add(new Variable(output.getText(), new ArrayList<>()));
         return new Output(outs);
     }
 
