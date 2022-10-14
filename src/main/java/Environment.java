@@ -40,9 +40,16 @@ class Environment {
     public String toString() {
         StringBuilder table = new StringBuilder();
         for (String s : outputNames) {
-            for (Value b : variableValues.get(s).valueList) {
-                table.append(b);
+            Variable entry = variableValues.get(s);
+
+            if (entry.valueList != null) {
+                for (Value b : entry.valueList) {
+                    table.append(b);
+                }
+            } else {
+                table.append(entry.value);
             }
+
             table.append("\t").append(s).append("\n");
         }
         return table.toString();
