@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="testOfLiveness.hw" type="Application" factoryName="Application" activateToolWindowBeforeRun="false">
+    <option name="MAIN_CLASS_NAME" value="main" />
+    <module name="HardwareSim" />
+    <option name="PROGRAM_PARAMETERS" value="src/main/java/testOfLiveness.hw" />
+    <method v="2">
+      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_Make Java Files" />
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

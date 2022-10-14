@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="04-trafiklys-liveness-test.hw" type="Application" factoryName="Application" activateToolWindowBeforeRun="false">
+  <configuration default="false" name="testIfCyclic.hw" type="Application" factoryName="Application" activateToolWindowBeforeRun="false">
     <option name="MAIN_CLASS_NAME" value="main" />
     <module name="HardwareSim" />
-    <option name="PROGRAM_PARAMETERS" value="src/main/java/04-trafiklys-liveness-test.hw" />
+    <option name="PROGRAM_PARAMETERS" value="src/main/java/testIfCyclic.hw" />
     <method v="2">
       <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_Make Java Files" />
       <option name="Make" enabled="true" />
