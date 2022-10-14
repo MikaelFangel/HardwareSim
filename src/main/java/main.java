@@ -4,11 +4,12 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class main {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException, ConditionException, UpdateException {
 
         // we expect exactly one argument: the name of the input file
         if (args.length != 1) {
