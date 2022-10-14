@@ -19,7 +19,7 @@
 
 Clr = (RedM && !YelM)
 Req = (ReqM || Button) && !Clr
-Red = !RedM && YelM || RedM && !YelM 
+Red = !RedM && YelM || RedM && !YelM
 Yel = !RedM && !YelM && Req || RedM && !YelM
 Green  = !Red && !Yel
 PGreen = Red && !Yel
@@ -27,7 +27,7 @@ PRed   = !PGreen
 M1 = Red || Yel
 
 // Check for liveness if 4 of the last bits cars had red or yellow
-Liveness = M1 && M2 && M3 && M4
+Liveness = !(M1 && M2 && M3 && M4)
 
 .simulate Button=001001111001
 /*
