@@ -76,18 +76,18 @@ class Prog extends AST {
         for (var stringOfBinaries : env.getTraces()) {
             Boolean prevBool = null;
             boolean isCyclic = true;
-            for (Boolean binary : env.getVariable(stringOfBinaries)) {
+            for (Value binary : env.getVariable(stringOfBinaries).valueList) {
                 // First case
                 if (prevBool == null) {
-                    prevBool = binary;
+                    prevBool = binary.bool;
                     continue;
                 }
                 // If not cyclic
-                if (prevBool == binary) {
+                if (prevBool == binary.bool) {
                     isCyclic = false;
                     break;
                 }
-                prevBool = binary;
+                prevBool = binary.bool;
             }
             if (isCyclic) {
                 System.out.println("Warning: " + stringOfBinaries + " is cyclic.\n");
@@ -105,7 +105,7 @@ class Hardware extends AST {
     }
 
     public void eval(Environment env) {
-        env.setVariable(variable.varName, new ArrayList<>());
+        env.setVariable(variable.varName, variable);
     }
 }
 
@@ -119,7 +119,7 @@ class Input extends AST {
     // Initialize input variables in hashmap
     public void eval(Environment env) {
         for (Variable variable : variableList) {
-            env.setVariable(variable.varName, new ArrayList<>());
+            env.setVariable(variable.varName, variable);
             env.setOutput(variable.varName);
         }
     }
@@ -140,7 +140,7 @@ class Output extends AST {
                 System.out.println("Warning: " + output.varName + " is written more than once in output.");
             else {
                 prevName.add(output.varName);
-                env.setVariable(output.varName, new ArrayList<>());
+                env.setVariable(output.varName, output);
                 env.setOutput(output.varName);
 
             }
@@ -158,13 +158,13 @@ class Latch extends AST {
     }
 
     public void eval(Environment env) {
-        env.setVariable(this.input.varName, new ArrayList<>());
-        env.setVariable(this.output.varName, new ArrayList<>());
+        env.setVariable(this.input.varName, input);
+        env.setVariable(this.output.varName, output);
     }
 
     // Initialize the output bitstring with 0
     public void initialize(Environment env) {
-        env.getVariable(output.varName).add(false);
+        env.getVariable(output.varName).valueList.add(new Value(false));
     }
 
     /**
@@ -178,12 +178,12 @@ class Latch extends AST {
         }
 
         // Input to the left of arrow in g4 file
-        List<Boolean> inputBinaries = env.getVariable(input.varName);
-        Boolean currentCycleInput = inputBinaries.get(Prog.cycle - 1);
+        List<Value> inputBinaries = env.getVariable(input.varName).valueList;
+        Value currentCycleInput = inputBinaries.get(Prog.cycle - 1);
 
         // Stores the current value of an incoming signal and outputs
         // it on an out-coming value at each cycle
-        env.getVariable(output.varName).add(currentCycleInput);
+        env.getVariable(output.varName).valueList.add(currentCycleInput);
     }
 }
 
@@ -212,11 +212,11 @@ class UpdateDec extends AST {
 
     public void eval(Environment env) {
         if (env.getVariable(this.varName) == null)
-            env.setVariable(this.varName, new ArrayList<>());
+            env.setVariable(this.varName, new Variable(this.varName, new ArrayList<>()));
         // Add boolean value to every variable in update for current cycle
         for (Expr expr : this.exprList) {
-            Boolean b = expr.eval(env);
-            env.getVariable(this.varName).add(b);
+            Value b = expr.eval(env);
+            env.getVariable(this.varName).valueList.add(new Value(b.bool));
         }
     }
 }
@@ -236,9 +236,9 @@ class Simulate extends AST {
 
 class SimIn extends AST {
     public String varName;
-    public List<Boolean> inputSignal;
+    public List<Value> inputSignal;
 
-    public SimIn(String varName, List<Boolean> inputSignal) {
+    public SimIn(String varName, List<Value> inputSignal) {
         this.varName = varName;
         this.inputSignal = inputSignal;
     }
@@ -250,12 +250,13 @@ class SimIn extends AST {
             System.err.println("Error: " + this.varName + " is not an input.");
             System.exit(1);
         }
-        env.setVariable(varName, inputSignal);
+
+        env.getVariable(this.varName).valueList = inputSignal;
     }
 }
 
 abstract class Expr extends AST {
-    abstract public Boolean eval(Environment env);
+    abstract public Value eval(Environment env);
 }
 
 class Negation extends Expr {
@@ -265,8 +266,8 @@ class Negation extends Expr {
         this.c1 = c1;
     }
 
-    public Boolean eval(Environment env) {
-        return !this.c1.eval(env);
+    public Value eval(Environment env) {
+        return new Value(!this.c1.eval(env).bool);
     }
 }
 
@@ -278,12 +279,12 @@ class Conjunction extends Expr {
         this.c2 = c2;
     }
 
-    public Boolean eval(Environment env) {
+    public Value eval(Environment env) {
         // We evaluate before return, so right side are evaluated even if left = 0
         // (always false)
-        Boolean left = this.c1.eval(env);
-        Boolean right = this.c2.eval(env);
-        return left && right;
+        Value left = this.c1.eval(env);
+        Value right = this.c2.eval(env);
+        return new Value(left.bool && right.bool);
     }
 }
 
@@ -295,40 +296,75 @@ class Disjunction extends Expr {
         this.c2 = c2;
     }
 
-    public Boolean eval(Environment env) {
+    public Value eval(Environment env) {
         // We evaluate before return, so right side are evaluated even if left = 1
         // (always true)
-        Boolean left = this.c1.eval(env);
-        Boolean right = this.c2.eval(env);
-        return left || right;
+        Value left = this.c1.eval(env);
+        Value right = this.c2.eval(env);
+        return new Value(left.bool || right.bool);
     }
 }
 
 class Variable extends Expr {
     String varName;
-    String string = "";
-    List<Boolean> bList;
+    Value value;
+    List<Value> valueList;
 
-    public Variable(String varName, List<Boolean> bList) {
+    public Variable(String varName, List<Value> valueList) {
         this.varName = varName;
-        this.bList = bList;
+        this.valueList = valueList;
     }
 
     public Variable(String varName, String string) {
         this.varName = varName;
-        this.string = string;
+        this.value = new Value(string);
     }
 
     /**
      * Get the current cycle bit from varName
      */
-    public Boolean eval(Environment env) {
+    public Value eval(Environment env) {
         if (env.getVariable(this.varName) == null) {
             System.err.println("Error: " + this.varName
                     + " does not exist in the environment yet. You cannot evaluate on a variable that has not been declared yet.");
             System.exit(1);
         }
 
-        return env.getVariable(this.varName).get(Prog.cycle);
+        return new Value(env.getVariable(this.varName).valueList.get(Prog.cycle).bool);
+    }
+}
+
+enum Type {
+    STR,
+    BIN
+}
+
+class Value {
+    Type type;
+    String string;
+    boolean bool;
+
+    Value(String string) {
+        this.type = Type.STR;
+        this.string = string;
+    }
+
+    Value(boolean bool) {
+        this.type = Type.BIN;
+        this.bool = bool;
+    }
+
+    public String toString() {
+        switch (type) {
+            case STR -> {
+                return string;
+            }
+            case BIN -> {
+                return bool ? "1" : "0";
+            }
+            default -> {
+                return null;
+            }
+        }
     }
 }
