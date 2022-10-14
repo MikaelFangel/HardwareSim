@@ -3,7 +3,7 @@
 // Trafiklys eksempel.
 
 .inputs Button 
-.outputs Red Yel Green PRed PGreen Clr Liveness
+.outputs Red Yel Green PRed PGreen Clr Liveness Safety Extra_safety_check
 
 .latch Red -> RedM
 .latch Yel -> YelM
@@ -25,6 +25,12 @@ Green  = !Red && !Yel
 PGreen = Red && !Yel
 PRed   = !PGreen
 M1 = Red || Yel
+
+// Check for safety according to task 7.
+Safety = (PGreen && Red)
+
+// Extended check that also passes when neither pedestrians have green or cars red
+Extra_safety_check = Safety || !(PGreen && Red)
 
 // Check for liveness if 4 of the last bits cars had red or yellow
 Liveness = !(M1 && M2 && M3 && M4)
