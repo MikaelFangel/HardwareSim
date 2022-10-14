@@ -1,14 +1,13 @@
-import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 class Environment {
-    private final HashMap<String, List<Boolean>> variableValues = new HashMap<>();
+    private final HashMap<String, Variable> variableValues = new HashMap<>();
     private final List<String> outputNames = new ArrayList<>();
 
-    public void setVariable(String name, List<Boolean> value) {
-        variableValues.put(name, value);
+    public void setVariable(String name, Variable variable) {
+        variableValues.put(name, variable);
     }
 
     public void setOutput(String varName) {
@@ -17,12 +16,14 @@ class Environment {
 
     /**
      * Only call this method after all cycles are done
-     * @return traces needed to test for e.g. 
+     *
+     * @return traces needed to test for e.g.
      */
     public List<String> getTraces() {
         List<String> keys = new ArrayList<>();
         for (String string : variableValues.keySet()) {
-            if (variableValues.get(string).size() > 0) {
+            if (variableValues.get(string).valueList != null &&
+                    variableValues.get(string).valueList.size() > 0) {
                 keys.add(string);
             }
         }
@@ -32,15 +33,15 @@ class Environment {
     /**
      * If no mapping for the key exists, return null
      */
-    public List<Boolean> getVariable(String key) {
+    public Variable getVariable(String key) {
         return variableValues.get(key);
     }
 
     public String toString() {
         StringBuilder table = new StringBuilder();
         for (String s : outputNames) {
-            for (Boolean b : variableValues.get(s)) {
-                table.append(b ? "1" : "0");
+            for (Value b : variableValues.get(s).valueList) {
+                table.append(b);
             }
             table.append("\t").append(s).append("\n");
         }
