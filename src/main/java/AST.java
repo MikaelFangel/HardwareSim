@@ -43,7 +43,7 @@ class Prog extends AST {
      * This method is called by main
      * (Whether input size is less than 1 is checked by the hwsim grammar)
      */
-    public void runSimulator(Environment env) {
+    public void runSimulator(Environment env) throws Exception {
         // Calculates number of cycles
         int numOfCycles = 0;
         for (var input : simulate.simIn) {
@@ -142,7 +142,6 @@ class Output extends AST {
                 prevName.add(output.varName);
                 env.setVariable(output.varName, output);
                 env.setOutput(output.varName);
-
             }
         }
     }
@@ -195,7 +194,7 @@ class Update extends AST {
     }
 
     // eval all update declarations
-    public void eval(Environment env) {
+    public void eval(Environment env) throws Exception {
         for (var updateDec : updateDecList)
             updateDec.eval(env);
     }
@@ -210,13 +209,16 @@ class UpdateDec extends AST {
         this.exprList = exprList;
     }
 
-    public void eval(Environment env) {
+    public void eval(Environment env) throws Exception {
         if (env.getVariable(this.varName) == null)
             env.setVariable(this.varName, new Variable(this.varName, new ArrayList<>()));
         // Add boolean value to every variable in update for current cycle
         for (Expr expr : this.exprList) {
             Value b = expr.eval(env);
-            env.getVariable(this.varName).valueList.add(new Value(b.bool));
+            if(b.type == Type.BIN)
+                env.getVariable(this.varName).valueList.add(new Value(b.bool));
+            else
+                throw new Exception("Error: Can't run update on string values");
         }
     }
 }
@@ -256,7 +258,7 @@ class SimIn extends AST {
 }
 
 abstract class Expr extends AST {
-    abstract public Value eval(Environment env);
+    abstract public Value eval(Environment env) throws Exception;
 }
 
 class Negation extends Expr {
@@ -266,8 +268,12 @@ class Negation extends Expr {
         this.c1 = c1;
     }
 
-    public Value eval(Environment env) {
-        return new Value(!this.c1.eval(env).bool);
+    public Value eval(Environment env) throws Exception {
+        Value value = this.c1.eval(env);
+        if (value.type == Type.BIN)
+            return new Value(!this.c1.eval(env).bool);
+        else
+            throw new ComparativeException("Error: can't negate other than binary numbers");
     }
 }
 
@@ -279,12 +285,16 @@ class Conjunction extends Expr {
         this.c2 = c2;
     }
 
-    public Value eval(Environment env) {
+    public Value eval(Environment env) throws Exception {
         // We evaluate before return, so right side are evaluated even if left = 0
         // (always false)
         Value left = this.c1.eval(env);
         Value right = this.c2.eval(env);
-        return new Value(left.bool && right.bool);
+
+        if (left.type == Type.BIN && right.type == Type.BIN)
+            return new Value(left.bool && right.bool);
+        else
+            throw new ComparativeException("Error: can't compare other than binary numbers");
     }
 }
 
@@ -296,12 +306,16 @@ class Disjunction extends Expr {
         this.c2 = c2;
     }
 
-    public Value eval(Environment env) {
+    public Value eval(Environment env) throws Exception {
         // We evaluate before return, so right side are evaluated even if left = 1
         // (always true)
         Value left = this.c1.eval(env);
         Value right = this.c2.eval(env);
-        return new Value(left.bool || right.bool);
+
+        if (left.type == Type.BIN && right.type == Type.BIN)
+            return new Value(left.bool || right.bool);
+        else
+            throw new ComparativeException("Error: can't compare other than binary numbers");
     }
 }
 
@@ -367,4 +381,11 @@ class Value {
             }
         }
     }
+}
+
+class ComparativeException extends Exception {
+    public ComparativeException(String errMsg) {
+        super(errMsg);
+    }
+
 }
