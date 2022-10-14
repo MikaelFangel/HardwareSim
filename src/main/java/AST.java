@@ -211,8 +211,8 @@ class UpdateDec extends AST {
     }
 
     public void eval(Environment env) {
-        if (env.getVariable(this.varname) == null)
-            env.setVariable(this.varname, new ArrayList<>());
+        if (env.getVariable(this.varName) == null)
+            env.setVariable(this.varName, new ArrayList<>());
         // Add boolean value to every variable in update for current cycle
         for (Expr expr : this.exprList) {
             Boolean b = expr.eval(env);
