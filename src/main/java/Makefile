@@ -15,7 +15,7 @@ hwsimLexer.java:	hwsim.g4
 hwsimLexer.class: hwsimLexer.java
 	javac $(GENERATED)
 
-test:	hwsimLexer.class main.class input.txt
+test:	hwsimLexer.java main.class input.txt
 	java main input.txt
 
 tree:	hwsimLexer.class hwsim.g4 input.txt
